@@ -99,7 +99,7 @@ if __name__ == "__main__":
                 thread = threading.Thread(target = start_build, args=(component, args.test_images,))
                 thread.start()
                 build_threads.append(thread)
-                time.sleep(2)
+                time.sleep(5)
 
         for thread in build_threads:
             thread.join()
