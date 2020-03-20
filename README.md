@@ -25,7 +25,7 @@ or
 2) Start executing scratch containers build for all these repositories, to ensure all containers are getting build successfully. Follow [Test Containers Builds](#test-container-builds) section.
 3) Start executing containers build for all these repositories. Resultant container images get available at brew image registry. These images will be used for the actual release. Follow [Build Images](#build-images) section.
 4) Populate the operator CSV manifests to refer images build form the last step. Manifest is present `operator-metadata` `dist-git` repo. This is already take care by [Build Images](#build-images). However If someone has already build images or you just want to reflect the image reference without build its, follow [Refelct Images SHA in operator CSV](#refelct-images-sha-in-operator-csv) section.
-5) Commit and push the CSV changes to `dist-git` repo. Build the `operator-metadata` image to publish the CSV manifest to `quay` application registry. Follow ``
+5) Commit and push the CSV changes to `dist-git` repo. Build the `operator-metadata` image to publish the CSV manifest to `quay` application registry. Follow [Build Operator Meta](#build-operator-meta) section.
 
 
 ### Sync Source Code
