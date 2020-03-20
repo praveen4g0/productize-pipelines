@@ -1,0 +1,3 @@
+*.sed
+nvr-list
+.envrc

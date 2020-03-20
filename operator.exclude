@@ -1,0 +1,7 @@
+/.git
+/ci
+/Dockerfile
+/container.yaml
+/content_sets.yml
+/cvp.yml
+/manifests

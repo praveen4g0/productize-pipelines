@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorSource
+metadata:
+  name: pre-stage-operators
+  namespace: openshift-marketplace
+spec:
+  authorizationToken:
+      secretName: pre-stage-operators-secret
+  endpoint: https://quay.io/cnr
+  registryNamespace: rh-osbs-operators
+  type: appregistry

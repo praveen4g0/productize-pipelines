@@ -1,0 +1,101 @@
+components:
+  pipelines:
+  - brew-package: openshift-pipelines-controller-rhel8-container
+    name: pipelines-controller-rhel8
+    replace: tekton-pipelines-controller
+    dir: openshift-pipelines-controller
+
+  - brew-package: openshift-pipelines-webhook-rhel8-container
+    name: pipelines-webhook-rhel8
+    replace: webhook
+    dir: openshift-pipelines-webhook
+
+  - brew-package: openshift-pipelines-creds-init-rhel8-container
+    name: pipelines-creds-init-rhel8
+    replace: arg_-creds-image
+    dir: openshift-pipelines-creds-init
+
+  - brew-package: openshift-pipelines-entrypoint-rhel8-container
+    name: pipelines-entrypoint-rhel8
+    replace: arg_-entrypoint-image
+    dir: openshift-pipelines-entrypoint
+
+  - brew-package: openshift-pipelines-git-init-rhel8-container
+    name: pipelines-git-init-rhel8
+    replace: arg_-git-image
+    dir: openshift-pipelines-git-init
+
+  - brew-package: openshift-pipelines-gcs-fetcher-rhel8-container
+    name: pipelines-gcs-fetcher-rhel8
+    replace: arg_-build-gcs-fetcher-image
+    dir: openshift-pipelines-gcs-fetcher
+
+  - brew-package: openshift-pipelines-gsutil-rhel8-container
+    name: pipelines-gsutil-rhel8
+    replace: arg_-gsutil-image
+    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-gsutil/plain/.oit/signed.repo?h=pipelines-1.0-rhel-8
+    dir: openshift-pipelines-gsutil
+
+  - brew-package: openshift-pipelines-imagedigestexporter-rhel8-container
+    name: pipelines-imagedigestexporter-rhel8
+    replace: arg_-imagedigest-exporter-image
+    dir: openshift-pipelines-imagedigestexporter
+
+  - brew-package: openshift-pipelines-kubeconfigwriter-rhel8-container
+    name: pipelines-kubeconfigwriter-rhel8
+    replace: arg_-kubeconfig-writer-image
+    dir: openshift-pipelines-kubeconfigwriter
+
+  - brew-package: openshift-pipelines-pullrequest-init-rhel8-container
+    name: pipelines-pullrequest-init-rhel8
+    replace: arg_-pr-image
+    dir: openshift-pipelines-pullrequest-init
+
+  - brew-package: openshift-pipelines-nop-rhel8-container
+    name: pipelines-nop-rhel8
+    replace: arg_-nop-image
+    dir: openshift-pipelines-nop
+  
+  triggers:
+  - brew-package: openshift-pipelines-triggers-controller-rhel-8-container
+    name: pipelines-triggers-controller-rhel8
+    replace: tekton-triggers-controller
+    dir: openshift-pipelines-triggers-controller
+
+  - brew-package: openshift-pipelines-triggers-webhook-rhel-8-container
+    name: pipelines-triggers-webhook-rhel8
+    replace: webhook
+    dir: openshift-pipelines-triggers-webhook
+
+  - brew-package: openshift-pipelines-triggers-eventlistenersink-rhel-8-container 
+    name: pipelines-triggers-eventlistenersink-rhel8
+    replace: arg_-el-image
+    dir: openshift-pipelines-triggers-eventlistenersink
+  
+  addons:
+  - brew-package: openshift-pipelines-catalog-buildah-rhel8-container
+    name: pipelines-catalog-buildah-rhel8
+    replace: param_builder_image
+    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-catalog-buildah/plain/repo.repo?h=pipelines-1.0-rhel-8
+    dir: openshift-pipelines-catalog-buildah
+  
+  operator:
+  - brew-package: openshift-pipelines-rhel8-operator-container
+    name: pipelines-operator-rhel8
+    replace: openshift-pipelines-operator
+    dir: openshift-pipelines-operator
+    pipeline_version: 0.10.1
+
+operator-meta:
+  brew-package: openshift-pipelines-operator-1-tech-preview-pipelines-rhel8-operator-metadata-container
+  name: openshift-pipelines-rhel8-operator-metadata
+  dir: openshift-pipelines-operator-prod-operator-metadata
+
+registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-10-tech-preview/
+version: 1.0.0
+
+mirror:
+  from-registry: registry-proxy.engineering.redhat.com/rh-osbs/
+  from-imageprefix: openshift-pipelines-10-tech-preview- 
+  to-registry: default-route-openshift-image-registry.apps-crc.testing/
+  to-namespace: openshift-pipelines-10-tech-preview/

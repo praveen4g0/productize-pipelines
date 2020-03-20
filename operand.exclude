@@ -1,0 +1,6 @@
+/.git
+/ci
+/cvp.yml
+/Dockerfile
+/container.yaml
+/repos
