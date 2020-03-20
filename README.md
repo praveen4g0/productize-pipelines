@@ -11,7 +11,7 @@
 
 or 
 
-* Execute `git clone git@gitlab.cee.redhat.com:hshinde/productize-svls.git $HOME/work/op-p12n/productize-svls`
+* Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-svls`
 * Then fire `./setup.sh`
 
 
