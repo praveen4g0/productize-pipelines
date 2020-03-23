@@ -12,10 +12,10 @@ update-csv-image-ref:
 	./release.sh
 
 make release-meta:
-	./meta
+	./meta.sh
 
 publish-operator:
 	./release.sh -p true
 
 enable-operator:
-	./enable-operator
+	./enable-operator.sh
