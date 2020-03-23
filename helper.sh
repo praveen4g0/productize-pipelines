@@ -36,6 +36,7 @@ function clone_repo() {
   if [[ -d ${workspace} ]]
   then
     cd ${workspace}
+    [[ "$(git rev-parse --abbrev-ref HEAD)" != "${branch}" ]] && git checkout ${branch}
     git merge --allow-unrelated-histories --no-edit origin/${branch}
   else
     git clone ${url} --branch ${branch} --single-branch ${workspace}
