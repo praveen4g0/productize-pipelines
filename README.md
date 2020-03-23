@@ -15,6 +15,27 @@ or
 * Then fire `./setup.sh`
 
 
+## Config
+
+* **[config.sh](./config.sh)**: 
+  - This file holds the general configuration about cloning and sync the source code. `*_UPSTREAM_URL` and `*_UPSTREAM_BRANCH` holds upstream pipeline's, trigger's, operator's repo URL and branch to clone.
+* **[image-config.yaml](./image-config.yaml)**: 
+  - This file holds the configuration for building and mirroring images for pipelines, triggers, operators, operator's metadata and catalog components.
+  - `replace`: This attribute determins how to generate `ENV` var for operator's container image, so images could be overriden as per the [operator configuration](https://github.com/openshift/tektoncd-pipeline-operator#override-images). Example 
+     ```
+     components:
+      pipelines:
+      - brew-package: openshift-pipelines-controller-rhel8-container
+        name: pipelines-controller-rhel8
+        replace: tekton-pipelines-controller
+     ``` 
+     `ENV` var gets generated here is like `PIPELINES_TEKTON_PIPELINES_CONTROLLER`. i.e. `<component name>_<replace>`. 
+  - `brew-package`: Is used to fetch build info by package name.
+  - `dir`: Is the components directory. Used when bulding an image using `rhpkg`
+  - `name`: Is used as image repo name while forming an image URL 
+  - `registry`: Used to deftimine image registry org while forming an image URL.  
+
+
 ## Build Pipeline, Trigger, Operator images Flow Overview
 
 <p align="center">
