@@ -11,7 +11,7 @@
 
 or 
 
-* Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-svls`
+* Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-pipelines`
 * Then fire `./setup.sh`
 
 
@@ -116,7 +116,7 @@ variables. One use case would be to use `direnv` and have an `.envrc`
 looking like the following:
 
 ```bash
-export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/hshinde/productize-svls
+export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/hshinde/productize-pipelines
 export WORKSPACE_DIR=${HOME}/src/p12n
 export USER=vdemeest
 ```

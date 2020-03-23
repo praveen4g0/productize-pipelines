@@ -2,7 +2,7 @@
 WORKSPACE_DIR="${WORKSPACE_DIR:-${HOME}/work/op-p12n}"
 
 # Location of the directory which contains this config.sh file
-SCRIPT_DIR="${SCRIPT_DIR:-${WORKSPACE_DIR}/productize-svls}"
+SCRIPT_DIR="${SCRIPT_DIR:-${WORKSPACE_DIR}/productize-pipelines}"
 
 UPSTREAM_DIR="${WORKSPACE_DIR}/upstream"
 DIST_GIT_DIR="${WORKSPACE_DIR}/dist-git"
