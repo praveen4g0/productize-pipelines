@@ -4,7 +4,7 @@
 ### Prerequisite
 * [rhpkg](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md)
 * python 3.7+ and pip
-* Get access into quay aplication repositories, so you can test the operator. Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
+* Get access to quay aplication repositories, so you can [test the OpenShift pipelines operator](#testing-opensift-pipelines-through-operator). Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
 
 ### Setup 
 * Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`
@@ -57,10 +57,15 @@ make update-csv-image-ref
 make release-meta
 ```
 
-## Test Operator Flow Overview
+## Testing OpenSift Pipelines through Operator
 
-Make sure you have access to any OpenSift 4 cluster before you begin the testing.
+### Prerequisite
+1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user
+2) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
+3) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL
+4) Log into to `OpenShift registry` using `oc registry login --insecure=true`
 
+### Flow
 <p align="center">
   <img width="100%" height="100%" src="image/test-flow.png">
 </p>

@@ -2,6 +2,7 @@
 
 import yaml
 from subprocess import Popen, PIPE, STDOUT, DEVNULL
+import concurrent.futures
 import sys
 import koji as brew
 import os 
@@ -12,7 +13,7 @@ import argparse
 def print_line():
     print("--------------------------------------------------------------------------------------------")
 
-def start_build(config, test):
+def build_image(config, test):
     print('Building an image for : {nvr}\n'.format(nvr = config['brew-package']))
     command = 'rhpkg --release pipelines-1.0-rhel-8 container-build'
     if "repo-url" in config:
@@ -22,11 +23,11 @@ def start_build(config, test):
         flag = ' --scratch'
         command = command + flag
     
-    proc = Popen([command], stdout=PIPE, shell=True)
+    proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
     (status, err) = proc.communicate()
-    if err:
+    if not status and err:
         print('Failed the build for : {nvr}'.format(nvr = config['brew-package']))
-        print(status.decode())
+        print(err.decode())
         sys.exit(1)
     print('Completed the build for : {nvr}'.format(nvr = config['brew-package']))
     print(status.decode())
@@ -74,7 +75,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tekton pipelines p12n release")
     parser.add_argument('-b', '--build-images', help='Want to build images, true if yes default is false', type=bool, default=False)
     parser.add_argument('-t', '--test-images', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
-    parser.add_argument('-d', '--deploy-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
+    parser.add_argument('-p', '--publish-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
     args = parser.parse_args()
     script_dir = os.getcwd()
 
@@ -93,17 +94,23 @@ if __name__ == "__main__":
     #start building images
     if args.build_images:
         build_threads = []
-        for name, components in release_config['components'].items():
-            for component in components:
-                os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = component["dir"]))
-                thread = threading.Thread(target = start_build, args=(component, args.test_images,))
-                thread.start()
-                build_threads.append(thread)
-                time.sleep(5)
+        failed_builds = 0
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            for name, components in release_config['components'].items():
+                for component in components:
+                    os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = component["dir"]))
+                    future = executor.submit(build_image, component, args.test_images)
+                    build_threads.append(future)
+                    time.sleep(5)
 
-        for thread in build_threads:
-            thread.join()
-    
+            for future in concurrent.futures.as_completed(build_threads):
+                if future.exception():
+                    failed_builds+= 1
+
+        if failed_builds > 0:
+            print('{builds} builds are failed '.format(builds=failed_builds))
+            sys.exit(1)
+
     if args.test_images:
         print('Scratch builds are completed')
         sys.exit(0)
