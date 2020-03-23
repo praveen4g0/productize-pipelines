@@ -94,8 +94,8 @@ TRIGGERS_COMPONENTS=("controller webhook eventlistenersink")
 sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-triggers-" "${TRIGGERS_COMPONENTS}"
 
 # sync operator repo
-TRIGGERS_COMPONENTS=("operator")
-sync_components_source "${OPO_UPSTREAM_URL}" "${OPO_UPSTREAM_BRANCH}" "operator" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${TRIGGERS_COMPONENTS}"
+OPERATOR_COMPONENTS=("operator")
+sync_components_source "${OPO_UPSTREAM_URL}" "${OPO_UPSTREAM_BRANCH}" "operator" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${OPERATOR_COMPONENTS}"
 
 echo "----------------------------------------------------------------------------"
 echo "Cloning buildah image"
