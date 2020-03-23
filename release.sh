@@ -28,7 +28,8 @@ def build_image(config, test):
     if not status and err:
         print('Failed the build for : {nvr}'.format(nvr = config['brew-package']))
         print(err.decode())
-        sys.exit(1)
+        raise Exception("Failed image build")
+
     print('Completed the build for : {nvr}'.format(nvr = config['brew-package']))
     print(status.decode())
     print_line()
@@ -67,9 +68,11 @@ def mirror_image(from_img, to_img):
     if not status and err:
         print('Failed to mirror images')
         print(err.decode())
-        return
+        print_line()
+        raise Exception('Failed mirroring')
     
-    print("Mirror completed")
+    print('Mirroring completed for {img}'.format(img=to_img))
+    print_line()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tekton pipelines p12n release")
@@ -173,9 +176,10 @@ if __name__ == "__main__":
         except yaml.YAMLError as exc:
             print(exc)
     
-    if args.deploy_operator:
+    if args.publish_operator:
         print("Publishing the operator metadata(CSV)")
         print_line()
+        
         os.chdir(script_dir)
         command = './meta.sh'.format(dir = script_dir)
         proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
@@ -191,12 +195,24 @@ if __name__ == "__main__":
         print_line()
         os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = operator_meata['dir']))
         mirror = release_config['mirror']
-        for name, components in release_config['components'].items():
-            for component in components:
+        mirror_threads = []
+        failed_mirrors = 0
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            for name, components in release_config['components'].items():
+                for component in components:
                     from_img = mirror['from-registry'] + mirror['from-imageprefix'] + component['name'] + '@' + component['image_sha']
                     to_img = mirror['to-registry'] + mirror['to-namespace'] + component['name'] + ':latest'
-                    mirror_image(from_img, to_img)
+                    future = executor.submit(mirror_image, from_img, to_img)
+                    mirror_threads.append(future)
                     print_line()
+                
+            for future in concurrent.futures.as_completed(mirror_threads):
+                if future.exception():
+                    failed_mirrors+= 1
+
+        if failed_mirrors > 0:
+            print('{mirrors} mirrorings are failed '.format(mirrors=failed_mirrors))
+            sys.exit(1)
 
 
 

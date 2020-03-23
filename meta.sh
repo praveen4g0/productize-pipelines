@@ -11,7 +11,6 @@ cd "${OP_OPERATOR_META_WORKSPACE}"
 
 git add .
 
-
 if output=$(git status --porcelain) && [ -z "$output" ]; then
   echo "No image reference changes to commit to the CSV"
   exit 0   
