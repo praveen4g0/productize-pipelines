@@ -200,8 +200,8 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             for name, components in release_config['components'].items():
                 for component in components:
-                    from_img = mirror['from-registry'] + mirror['from-imageprefix'] + component['name'] + '@' + component['image_sha']
-                    to_img = mirror['to-registry'] + mirror['to-namespace'] + component['name'] + ':latest'
+                    from_img = mirror['from-registry'] + '/' + mirror['from-org'] + component['name'] + '@' + component['image_sha']
+                    to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + component['name'] + ':latest'
                     future = executor.submit(mirror_image, from_img, to_img)
                     mirror_threads.append(future)
                     print_line()

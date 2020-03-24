@@ -16,10 +16,12 @@ function sync_components_source() {
   local dist_git_components=$7
   local ignore_components_sync=$8
  
-  echo "Cloning upstream ${UPSTREAM_DIR}/${upstream_repo_name}"
   OP_UPSTREAM_WORKSPACE=${UPSTREAM_DIR}/${upstream_repo_name}
+  echo "----------------------------------------------------------------------------"
+  echo "Fething upstream ${OP_UPSTREAM_WORKSPACE}"
+  echo "----------------------------------------------------------------------------"
   UPSTREAM_COMMIT=$(clone_repo "${OP_UPSTREAM_WORKSPACE}" "${upstream_repo}" "${upstream_branch}")
-
+  
   for IMAGE in ${dist_git_components}
   do
     OP_DIST_GIT_WORKSPACE=${DIST_GIT_DIR}/${dist_git_repo_prefix}${IMAGE}
@@ -84,14 +86,14 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
   done
 }
 
-# sync pipelines repo
-PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
-IGNORE_IMAGE_SYNC=("nop gsutil")
-sync_components_source "${OP_UPSTREAM_URL}" "${OP_UPSTREAM_BRANCH}" "pipelines" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${PIPELINE_COMPONENTS}" "${IGNORE_IMAGE_SYNC}"
+# # sync pipelines repo
+# PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
+# IGNORE_IMAGE_SYNC=("nop gsutil")
+# sync_components_source "${OP_UPSTREAM_URL}" "${OP_UPSTREAM_BRANCH}" "pipelines" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${PIPELINE_COMPONENTS}" "${IGNORE_IMAGE_SYNC}"
 
-# sync triggers repo
-TRIGGERS_COMPONENTS=("controller webhook eventlistenersink")
-sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-triggers-" "${TRIGGERS_COMPONENTS}"
+# # sync triggers repo
+# TRIGGERS_COMPONENTS=("controller webhook eventlistenersink")
+# sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-triggers-" "${TRIGGERS_COMPONENTS}"
 
 # sync operator repo
 OPERATOR_COMPONENTS=("operator")

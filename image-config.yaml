@@ -95,7 +95,7 @@ registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-1
 version: 1.0.0
 
 mirror:
-  from-registry: registry-proxy.engineering.redhat.com/rh-osbs/
-  from-imageprefix: openshift-pipelines-10-tech-preview- 
-  to-registry: default-route-openshift-image-registry.apps-crc.testing/
-  to-namespace: openshift-pipelines-10-tech-preview/
+  from-registry: registry-proxy.engineering.redhat.com
+  from-org: rh-osbs/openshift-pipelines-10-tech-preview-
+  to-registry: default-route-openshift-image-registry.apps-crc.testing
+  to-org: openshift-pipelines-10-tech-preview
