@@ -33,7 +33,14 @@ function clone_repo() {
   local branch=$3
   local lcd=$(pwd)
 
-  git clone ${url} --branch ${branch} --single-branch ${workspace}
+  if [[ -d ${workspace} ]]
+  then
+    cd ${workspace}
+    [[ "$(git rev-parse --abbrev-ref HEAD)" != "${branch}" ]] && git checkout ${branch}
+    git merge --allow-unrelated-histories --no-edit origin/${branch}
+  else
+    git clone ${url} --branch ${branch} --single-branch ${workspace}
+  fi
 
   cd ${workspace}
   local commit=$(git rev-parse HEAD)
