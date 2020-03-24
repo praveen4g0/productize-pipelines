@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-oc patch configs.imageregistry.operator.openshift.io/cluster -p='{"spec":{"defaultRoute":true}}' --type=merge
+oc patch operatorhub.config.openshift.io/cluster -p='{"spec":{"disableAllDefaultSources":true}}' --type=merge
 oc delete opsrc redhat-operators -n openshift-marketplace --ignore-not-found
 oc delete opsrc certified-operators -n openshift-marketplace --ignore-not-found
 oc delete opsrc community-operators -n openshift-marketplace --ignore-not-found
