@@ -80,7 +80,7 @@ make release-meta
 
 ## Testing OpenSift Pipelines through Operator
 
-### Prerequisite
+### Prerequisites
 1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user
 2) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
 3) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL
