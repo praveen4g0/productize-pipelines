@@ -86,14 +86,14 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
   done
 }
 
-# # sync pipelines repo
-# PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
-# IGNORE_IMAGE_SYNC=("nop gsutil")
-# sync_components_source "${OP_UPSTREAM_URL}" "${OP_UPSTREAM_BRANCH}" "pipelines" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${PIPELINE_COMPONENTS}" "${IGNORE_IMAGE_SYNC}"
+# sync pipelines repo
+PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
+IGNORE_IMAGE_SYNC=("nop gsutil")
+sync_components_source "${OP_UPSTREAM_URL}" "${OP_UPSTREAM_BRANCH}" "pipelines" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${PIPELINE_COMPONENTS}" "${IGNORE_IMAGE_SYNC}"
 
-# # sync triggers repo
-# TRIGGERS_COMPONENTS=("controller webhook eventlistenersink")
-# sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-triggers-" "${TRIGGERS_COMPONENTS}"
+# sync triggers repo
+TRIGGERS_COMPONENTS=("controller webhook eventlistenersink")
+sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-triggers-" "${TRIGGERS_COMPONENTS}"
 
 # sync operator repo
 OPERATOR_COMPONENTS=("operator")

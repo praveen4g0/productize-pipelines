@@ -40,7 +40,6 @@ function clone_repo() {
     [[ "$(git rev-parse --abbrev-ref HEAD)" != "${branch}" ]] && git checkout ${branch}
     git merge --allow-unrelated-histories --no-edit --quiet origin/${branch}
   else
-    echo "git clone $(pwd)"
     git clone ${url} --branch ${branch} ${workspace}
   fi
 
