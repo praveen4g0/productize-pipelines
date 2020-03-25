@@ -2,20 +2,20 @@
 sync-source:
 	./sync-source.sh
 
-test-image-builds: 
-	./release.sh -b true -t true 
+test-image-builds:
+	./release.py -b true -t true 
 
-release-images: 
-	./release.sh -b true
+release-images:
+	./release.py -b true
 
 update-csv-image-ref:
-	./release.sh
+	./release.py
 
 make release-meta:
 	./meta.sh
 
 publish-operator:
-	./release.sh -p true
+	./release.py -p true
 
 enable-operator:
 	./enable-operator.sh
