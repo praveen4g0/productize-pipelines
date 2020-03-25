@@ -101,11 +101,11 @@ make release-meta
     {
       "user": {
         "username": "'"${QUAY_USERNAME}"'",
-        "password": "'"${QUAY_PASSWORD}"'"
+        "password": "'"${QUAY_TOKEN}"'"
       }
     }' | jq -r '.token')
     ```
-    where the `QUAY_USERNAME` -> `rh-osbs-operators+<name>`, `QUAY_PASSWORD` -> robot token recived in encrypted email.
+    where the `QUAY_USERNAME` -> `rh-osbs-operators+<name>`, `QUAY_TOKEN` -> robot token recived in the encrypted email.
 
     Create a secret using Quay token
 
