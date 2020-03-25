@@ -113,10 +113,10 @@ make release-meta
     oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
     ```
 3) All the images built in the previous section are present in brew's registry which could be accessed over RH VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Follow [Publish Operator](#publish-operator) section. The reason it called `publish operator` because it gets the latest build images SHA, updates CSV, commit changes to dist git, publishes the operator metadata to quay registry and mirrors those images to target OpenShift cluster. 
-If image mirroring fails, run the mkae target again. 
+If image mirroring fails, run the make target again until you see no errors. 
 4) Create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle. 
 `OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section.
-5) Subscribe to the `OpenShift Pipelines Operator` and it will spin up all pipelines resources in the OpenShift Cluster
+5) Subscribe to the `OpenShift Pipelines Operator` and it will spin up all pipelines resources in the OpenShift Cluster.
 
 
 🎉 tada!
