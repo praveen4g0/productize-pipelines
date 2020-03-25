@@ -1,7 +1,7 @@
 # OpenShift pipelines p12n setup
 
 
-### Prerequisite
+### Prerequisites
 * [rhpkg](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md)
 * python 3.7+ and pip
 * Get access to quay aplication repositories, so you can [test the OpenShift pipelines operator](#testing-opensift-pipelines-through-operator). Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
@@ -82,7 +82,7 @@ make release-meta
 
 ## Testing OpenSift Pipelines through Operator
 
-### Prerequisites
+### Prerequisite
 1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user
 2) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
 3) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL
@@ -95,7 +95,7 @@ make release-meta
 
 1) Make sure operator manifests are published to the quay application registry from previous build flow steps. If not then no worries, one of the following step ensures that.
 
-2) The operator manifests bundle is present in `quay.io` application repository which has limited access (check [Prerequisite](#Prerequisite)). To access the operator metadata, a user needs to obtain the quay `token` and needs to create `secret` in the OpenShift cluster. 
+2) The operator manifests bundle is present in `quay.io` application repository which has limited access (check [Prerequisites](#prerequisites)). To access the operator metadata, a user needs to obtain the quay `token` and needs to create `secret` in the OpenShift cluster. 
     ```
     TOKEN=$(curl -sH "Content-Type: application/json" -XPOST https://quay.io/cnr/api/v1/users/login -d '
     {
