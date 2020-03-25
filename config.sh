@@ -20,7 +20,7 @@ OP_OPERATOR_METADATA_DIST_GIT_BRANCH="pipelines-1-rhel-8"
 # Pipelines Repository URL's
 OP_UPSTREAM_URL="git@github.com:openshift/tektoncd-pipeline.git"
 # Pipelines Specify upstream tag or branch
-OP_UPSTREAM_BRANCH="release-v0.10.1"
+OP_UPSTREAM_BRANCH="release-v0.11.0"
 
 # Pipelines Triggers Repository URL's
 OPT_UPSTREAM_URL="git@github.com:openshift/tektoncd-triggers.git"
@@ -30,4 +30,4 @@ OPT_UPSTREAM_BRANCH="release-v0.3.1"
 # Pipelines Operator Repository URL's
 OPO_UPSTREAM_URL="git@github.com:openshift/tektoncd-pipeline-operator.git"
 # Pipelines Triggers upstream tag or branch
-OPO_UPSTREAM_BRANCH="master"
+OPO_UPSTREAM_BRANCH="v0.11.x"
