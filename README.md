@@ -107,7 +107,7 @@ make release-meta
     ```
     where the `QUAY_USERNAME` -> `rh-osbs-operators+<name>`, `QUAY_PASSWORD` -> robot token recived in encrypted email.
 
-    Create a secret using Quey token
+    Create a secret using Quay token
 
     ```
     oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
