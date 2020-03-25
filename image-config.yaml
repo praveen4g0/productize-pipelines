@@ -1,3 +1,5 @@
+version: 1.0.0
+
 components:
   pipelines:
   - brew-package: openshift-pipelines-controller-rhel8-container
@@ -92,10 +94,10 @@ operator-meta:
   dir: openshift-pipelines-operator-prod-operator-metadata
 
 registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-10-tech-preview/
-version: 1.0.0
 
 mirror:
   from-registry: registry-proxy.engineering.redhat.com
   from-org: rh-osbs/openshift-pipelines-10-tech-preview-
   to-registry: default-route-openshift-image-registry.apps-crc.testing
   to-org: openshift-pipelines-10-tech-preview
+  parallel: 3

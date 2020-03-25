@@ -62,6 +62,7 @@ def exist(env, envVars):
 
 def mirror_image(from_img, to_img):
     print('Mirroring image {from_img} ---> {to_img}'.format(from_img=from_img, to_img=to_img))
+    print_line()
     command = 'oc image mirror --insecure {from_img} {to_img}'.format(from_img=from_img, to_img=to_img)
     proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
     (status, err) = proc.communicate()
@@ -197,15 +198,14 @@ if __name__ == "__main__":
         mirror = release_config['mirror']
         mirror_threads = []
         failed_mirrors = 0
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=mirror['parallel']) as executor:
             for name, components in release_config['components'].items():
                 for component in components:
                     from_img = mirror['from-registry'] + '/' + mirror['from-org'] + component['name'] + '@' + component['image_sha']
                     to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + component['name'] + ':latest'
                     future = executor.submit(mirror_image, from_img, to_img)
                     mirror_threads.append(future)
-                    print_line()
-                
+                    
             for future in concurrent.futures.as_completed(mirror_threads):
                 if future.exception():
                     failed_mirrors+= 1
