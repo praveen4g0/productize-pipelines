@@ -75,6 +75,9 @@ def mirror_image(from_img, to_img):
     print('Mirroring completed for {img}'.format(img=to_img))
     print_line()
 
+def form_csv_name(name, version):
+    return name.split('.v')[0] + '.v' + version
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tekton pipelines p12n release")
     parser.add_argument('-b', '--build-images', help='Want to build images, true if yes default is false', type=bool, default=False)
@@ -141,15 +144,15 @@ if __name__ == "__main__":
         try:
             csv = yaml.safe_load(csv_stream)
             deployment = csv['spec']['install']['spec']['deployments'][0]
-            #replace operator image
+            #replace operators images
             operator = release_config['components']['operator'][0]
+            operator_image = release_config['registry'] + operator['name'] + '@' + operator['image_sha']
             relatedImages = []
             for container in deployment['spec']['template']['spec']['containers']:
                 if container['name'] != operator['replace']:
                     continue
                 
-                image = release_config['registry'] + operator['name'] + '@' + operator['image_sha']
-                container['image'] = image
+                container['image'] = operator_image
                 
                 for name, components in release_config['components'].items():
                     if name == 'operator':
@@ -169,7 +172,11 @@ if __name__ == "__main__":
                         
                         relatedImages.append(envVar.copy())
 
+            csv['metadata']['annotations']['containerImage'] = operator_image
             csv['spec']['relatedImages'] = relatedImages
+            csv['spec']['version'] = release_config['version']
+            csv['metadata']['name'] = form_csv_name(csv['metadata']['name'], release_config['version'])
+
             csv_stream.seek(0)
             csv_stream.truncate()
             yaml.safe_dump(csv, csv_stream, default_flow_style=False)
@@ -178,7 +185,7 @@ if __name__ == "__main__":
             print(exc)
     
     if args.publish_operator:
-        print("Publishing the operator metadata(CSV)")
+        print('Publishing the operator metadata(CSV)')
         print_line()
         
         os.chdir(script_dir)
@@ -192,7 +199,7 @@ if __name__ == "__main__":
         print(status.decode())
         print_line()
 
-        print("Mirroring images")
+        print('Mirroring images')
         print_line()
         os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = operator_meata['dir']))
         mirror = release_config['mirror']
