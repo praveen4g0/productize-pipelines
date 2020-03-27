@@ -11,7 +11,7 @@ import time
 import argparse
 
 def print_line():
-    print("--------------------------------------------------------------------------------------------")
+    print("-" * 100)
 
 def build_image(config, test):
     print('Building an image for : {nvr}\n'.format(nvr = config['brew-package']))
@@ -79,10 +79,12 @@ def form_csv_name(name, version):
     return name.split('.v')[0] + '.v' + version
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Tekton pipelines p12n release")
-    parser.add_argument('-b', '--build-images', help='Want to build images, true if yes default is false', type=bool, default=False)
-    parser.add_argument('-t', '--test-images', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
-    parser.add_argument('-p', '--publish-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
+    parser = argparse.ArgumentParser(description="OpenShift Pipelines Productization")
+    parser.add_argument('-bri', '--build-release-images', help='Want to build and releases images, true if yes default is false', type=bool, default=False)
+    parser.add_argument('-bt', '--build-tests', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
+    parser.add_argument('-ucsv', '--update-csv', help='Want to update CSV with released images url, true if yes default is false', type=bool, default=False)
+    parser.add_argument('-bm', '--build-metadata', help='Want to build metadata, true if yes default is false', type=bool, default=False)
+    parser.add_argument('-eo', '--enable-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
     args = parser.parse_args()
     script_dir = os.getcwd()
 
@@ -95,18 +97,18 @@ if __name__ == "__main__":
         except yaml.YAMLError as exc:
             print(exc)
 
-    os.chdir("../dist-git")
-    dir = os.getcwd()
-
     #start building images
-    if args.build_images:
+    if args.build_release_images:
+        os.chdir("../dist-git")
+        dist_git_dir = os.getcwd()
+        
         build_threads = []
         failed_builds = 0
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             for name, components in release_config['components'].items():
                 for component in components:
-                    os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = component["dir"]))
-                    future = executor.submit(build_image, component, args.test_images)
+                    os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = component["dir"]))
+                    future = executor.submit(build_image, component, args.build_tests)
                     build_threads.append(future)
                     time.sleep(5)
 
@@ -118,76 +120,76 @@ if __name__ == "__main__":
             print('{builds} builds are failed '.format(builds=failed_builds))
             sys.exit(1)
 
-    if args.test_images:
-        print('Scratch builds are completed')
-        sys.exit(0)
+        if args.build_tests:
+            print('Build tests are completed')
+            sys.exit(0)
 
-    #list images
-    proc = Popen(['brew list-builds --quiet --prefix="openshift-pipelines" | sort -V'], stdout=PIPE, shell=True)
-    (builds, err) = proc.communicate()
-    if err:
-        print('Unabled to list brew builds')
-        sys.exit(1)
+    if args.build_release_images or args.update_csv:
+        #list images
+        proc = Popen(['brew list-builds --quiet --prefix="openshift-pipelines" | sort -V'], stdout=PIPE, shell=True)
+        (builds, err) = proc.communicate()
+        if err:
+            print('Unabled to list brew builds')
+            sys.exit(1)
 
-    #get image SHA for each component
-    for name, components in release_config['components'].items():
-        for component in components:
-            build = get_latest_build(builds, component['brew-package'], release_config["version"])
-            component['image_sha'] = get_image_sha(build)
-            print(component)
-            print_line()
+        #get image SHA for each component
+        for name, components in release_config['components'].items():
+            for component in components:
+                build = get_latest_build(builds, component['brew-package'], release_config["version"])
+                component['image_sha'] = get_image_sha(build)
+                print(component)
+                print_line()
 
-    #update operator csv manifest
-    operator_meata = release_config['operator-meta']
-    os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = operator_meata['dir']))
-    with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r+') as csv_stream:
-        try:
-            csv = yaml.safe_load(csv_stream)
-            deployment = csv['spec']['install']['spec']['deployments'][0]
-            #replace operators images
-            operator = release_config['components']['operator'][0]
-            operator_image = release_config['registry'] + operator['name'] + '@' + operator['image_sha']
-            relatedImages = []
-            for container in deployment['spec']['template']['spec']['containers']:
-                if container['name'] != operator['replace']:
-                    continue
-                
-                container['image'] = operator_image
-                
-                for name, components in release_config['components'].items():
-                    if name == 'operator':
+        #update operator csv manifest
+        operator_meata = release_config['operator-meta']
+        os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meata['dir']))
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r+') as csv_stream:
+            try:
+                csv = yaml.safe_load(csv_stream)
+                deployment = csv['spec']['install']['spec']['deployments'][0]
+                #replace operators images
+                operator = release_config['components']['operator'][0]
+                operator_image = release_config['registry'] + operator['name'] + '@' + operator['image_sha']
+                relatedImages = []
+                for container in deployment['spec']['template']['spec']['containers']:
+                    if container['name'] != operator['replace']:
                         continue
+                    
+                    container['image'] = operator_image
+                    
+                    for name, components in release_config['components'].items():
+                        if name == 'operator':
+                            continue
 
-                    for component in components:
-                        env = 'IMAGE_' + name + '_' + component['replace']
-                        env = env.upper().replace('-', '_')
-                        value = release_config['registry'] + component['name'] + '@' + component['image_sha']
-                        envVar = {'name':env, 'value':value}
-                        
-                        index = exist(env, container['env'])
-                        if index != -1:
-                            container['env'][index]['value'] = value
-                        else:
-                            container['env'].append(envVar.copy())         
-                        
-                        relatedImages.append(envVar.copy())
+                        for component in components:
+                            env = 'IMAGE_' + name + '_' + component['replace']
+                            env = env.upper().replace('-', '_')
+                            value = release_config['registry'] + component['name'] + '@' + component['image_sha']
+                            envVar = {'name':env, 'value':value}
+                            
+                            index = exist(env, container['env'])
+                            if index != -1:
+                                container['env'][index]['value'] = value
+                            else:
+                                container['env'].append(envVar.copy())         
+                            
+                            relatedImages.append(envVar.copy())
 
-            csv['metadata']['annotations']['containerImage'] = operator_image
-            csv['spec']['relatedImages'] = relatedImages
-            csv['spec']['version'] = release_config['version']
-            csv['metadata']['name'] = form_csv_name(csv['metadata']['name'], release_config['version'])
+                csv['metadata']['annotations']['containerImage'] = operator_image
+                csv['spec']['relatedImages'] = relatedImages
+                csv['spec']['version'] = release_config['version']
+                csv['metadata']['name'] = form_csv_name(csv['metadata']['name'], release_config['version'])
 
-            csv_stream.seek(0)
-            csv_stream.truncate()
-            yaml.safe_dump(csv, csv_stream, default_flow_style=False)
+                csv_stream.seek(0)
+                csv_stream.truncate()
+                yaml.safe_dump(csv, csv_stream, default_flow_style=False)
 
-        except yaml.YAMLError as exc:
-            print(exc)
-    
-    if args.publish_operator:
+            except yaml.YAMLError as exc:
+                print(exc)
+
+    if args.build_metadata:
         print('Publishing the operator metadata(CSV)')
         print_line()
-        
         os.chdir(script_dir)
         command = './meta.sh'.format(dir = script_dir)
         proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
@@ -198,7 +200,8 @@ if __name__ == "__main__":
             sys.exit(1)
         print(status.decode())
         print_line()
-
+    
+    if args.enable_operator:
         print('Mirroring images')
         print_line()
         os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = operator_meata['dir']))

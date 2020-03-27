@@ -3,10 +3,10 @@ sync-source:
 	./sync-source.sh
 
 test-image-builds:
-	./release.py -b true -t true 
+	./release.py -bri true -bt true 
 
 release-images:
-	./release.py -b true
+	./release.py -bri true
 
 update-csv-image-ref:
 	./release.py
