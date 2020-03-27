@@ -9,6 +9,7 @@ import os
 import threading
 import time
 import argparse
+from pathlib import Path
 
 def print_line():
     print("-" * 100)
@@ -87,19 +88,20 @@ if __name__ == "__main__":
     parser.add_argument('-eo', '--enable-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
     args = parser.parse_args()
     script_dir = os.getcwd()
+    super_dir = Path(script_dir).parent
 
     #load config
-    with open("image-config.yaml", 'r') as stream:
+    with open('image-config.yaml', 'r') as stream:
         try:
             release_config = yaml.safe_load(stream)
-            print("Building the pipeline version : " + release_config['version'])
+            print('Building the pipeline version : ' + release_config['version'])
             print_line()
         except yaml.YAMLError as exc:
             print(exc)
 
     #start building images
     if args.build_release_images:
-        os.chdir("../dist-git")
+        os.chdir('{root}/dist-git'.format(root=super_dir))
         dist_git_dir = os.getcwd()
         
         build_threads = []
@@ -141,6 +143,8 @@ if __name__ == "__main__":
                 print_line()
 
         #update operator csv manifest
+        os.chdir('{root}/dist-git'.format(root=super_dir))
+        dist_git_dir = os.getcwd()
         operator_meata = release_config['operator-meta']
         os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meata['dir']))
         with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r+') as csv_stream:

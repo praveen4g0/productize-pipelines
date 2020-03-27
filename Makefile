@@ -9,13 +9,13 @@ release-images:
 	./release.py -bri true
 
 update-csv-image-ref:
-	./release.py
-
-make release-meta:
-	./meta.sh
+	./release.py -ucsv true
 
 publish-operator:
-	./release.py -p true
+	./release.py -ucsv true -bm true
+
+complete-release:
+	./release.py -bri true -ucsv true -bm true
 
 enable-operator:
 	./enable-operator.sh
