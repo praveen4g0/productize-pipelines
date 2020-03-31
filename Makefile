@@ -3,19 +3,19 @@ sync-source:
 	./sync-source.sh
 
 test-image-builds:
-	./release.py -b true -t true 
+	./release.py -bri true -bt true 
 
 release-images:
-	./release.py -b true
-
-update-csv-image-ref:
-	./release.py
-
-make release-meta:
-	./meta.sh
+	./release.py -bri true
 
 publish-operator:
-	./release.py -p true
+	./release.py -ucsv true -bm true
+
+update-csv-image-ref:
+	./release.py -ucsv true
+
+complete-release:
+	./release.py -bri true -ucsv true -bm true
 
 enable-operator:
-	./enable-operator.sh
+	./release.py -eo true
