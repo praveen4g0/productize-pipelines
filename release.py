@@ -12,12 +12,12 @@ import argparse
 from pathlib import Path
 
 def print_line():
-    print("-" * 100)
+    print('-' * 100)
 
 def build_image(config, test):
     print('Building an image for : {nvr}\n'.format(nvr = config['brew-package']))
     command = 'rhpkg --release pipelines-1.0-rhel-8 container-build'
-    if "repo-url" in config:
+    if 'repo-url' in config:
         flag = ' --repo-url="{url}"'.format(url = config['repo-url'])
         command = command + flag
     if test:
@@ -29,16 +29,16 @@ def build_image(config, test):
     if not status and err:
         print('Failed the build for : {nvr}'.format(nvr = config['brew-package']))
         print(err.decode())
-        raise Exception("Failed image build")
+        raise Exception('Failed image build')
 
     print('Completed the build for : {nvr}'.format(nvr = config['brew-package']))
     print(status.decode())
     print_line()
 
 def get_latest_build(builds, nvr, version):
-    latest = ""
+    latest = ''
     for build_id in iter(builds.splitlines()):
-        build_name = nvr + "-v" + version
+        build_name = nvr + '-v' + version
         if build_name.encode() not in build_id: 
             continue
         
@@ -80,7 +80,7 @@ def form_csv_name(name, version):
     return name.split('.v')[0] + '.v' + version
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="OpenShift Pipelines Productization")
+    parser = argparse.ArgumentParser(description='OpenShift Pipelines Productization')
     parser.add_argument('-bri', '--build-release-images', help='Want to build and releases images, true if yes default is false', type=bool, default=False)
     parser.add_argument('-bt', '--build-tests', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
     parser.add_argument('-ucsv', '--update-csv', help='Want to update CSV with released images url, true if yes default is false', type=bool, default=False)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             for name, components in release_config['components'].items():
                 for component in components:
-                    os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = component["dir"]))
+                    os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = component['dir']))
                     future = executor.submit(build_image, component, args.build_tests)
                     build_threads.append(future)
                     time.sleep(5)
@@ -137,7 +137,7 @@ if __name__ == "__main__":
         #get image SHA for each component
         for name, components in release_config['components'].items():
             for component in components:
-                build = get_latest_build(builds, component['brew-package'], release_config["version"])
+                build = get_latest_build(builds, component['brew-package'], release_config['version'])
                 component['image_sha'] = get_image_sha(build)
                 print(component)
                 print_line()
@@ -160,6 +160,8 @@ if __name__ == "__main__":
                         continue
                     
                     container['image'] = operator_image
+                    image = {'name':container['name'].upper().replace('-', '_'), 'value':operator_image}
+                    relatedImages.append(image.copy())
                     
                     for name, components in release_config['components'].items():
                         if name == 'operator':
@@ -190,6 +192,7 @@ if __name__ == "__main__":
 
             except yaml.YAMLError as exc:
                 print(exc)
+                sys.exit(1)
 
     if args.build_metadata:
         print('Publishing the operator metadata(CSV)')
@@ -208,17 +211,39 @@ if __name__ == "__main__":
     if args.enable_operator:
         print('Mirroring images')
         print_line()
-        os.chdir('{pwd}/{dir}'.format(pwd = dir, dir = operator_meata['dir']))
+        
+        os.chdir(script_dir)
+        command = './sync-source.sh metasync'
+        proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
+        (status, err) = proc.communicate()
+        if not status and err:
+            print('Failed to execute meatadata sync')
+            print(err)
+            sys.exit(1)
+        print(status.decode())
+        print_line()
+
+        operator_meta = release_config['operator-meta']
+        os.chdir('{root}/dist-git/{dir}'.format(root = super_dir, dir = operator_meta['dir']))
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r') as csv_stream:
+            try:
+                csv = yaml.safe_load(csv_stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+                sys.exit(1)
+        related_mages = csv['spec']['relatedImages']
+        
         mirror = release_config['mirror']
         mirror_threads = []
         failed_mirrors = 0
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=mirror['parallel']) as executor:
-            for name, components in release_config['components'].items():
-                for component in components:
-                    from_img = mirror['from-registry'] + '/' + mirror['from-org'] + component['name'] + '@' + component['image_sha']
-                    to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + component['name'] + ':latest'
-                    future = executor.submit(mirror_image, from_img, to_img)
-                    mirror_threads.append(future)
+            for image_url in related_mages:
+                image = image_url['value'].split('/')[2]
+                from_img = mirror['from-registry'] + '/' + mirror['from-org'] + '/' + mirror['from-image-prefix'] + image
+                to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + image.split('@')[0] + ':latest'
+                future = executor.submit(mirror_image, from_img, to_img)
+                mirror_threads.append(future)
                     
             for future in concurrent.futures.as_completed(mirror_threads):
                 if future.exception():
@@ -227,6 +252,17 @@ if __name__ == "__main__":
         if failed_mirrors > 0:
             print('{mirrors} mirrorings are failed '.format(mirrors=failed_mirrors))
             sys.exit(1)
+        
+        os.chdir(script_dir)
+        command = './enable-operator.sh'
+        proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
+        (status, err) = proc.communicate()
+        if not status and err:
+            print('Failed to apply operator-config')
+            print(err)
+            sys.exit(1)
+        print(status.decode())
+        print_line()
 
 
 

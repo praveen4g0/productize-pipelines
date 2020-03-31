@@ -11,12 +11,11 @@ cd "${OP_OPERATOR_META_WORKSPACE}"
 
 git add .
 
-if output=$(git status --porcelain) && [ -z "$output" ]; then
+if output=$(git status --porcelain) && [ -n "$output" ]; then
+  echo "Update image references in CSV" | \
+  git commit -v -F -
+else
   echo "No image reference changes to commit to the CSV"
-  exit 0   
 fi
-
-echo "Update image references in CSV" | \
-git commit -v -F -
 
 build ${OP_OPERATOR_META_WORKSPACE}

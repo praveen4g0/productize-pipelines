@@ -86,6 +86,15 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
   done
 }
 
+if [ "$1" == "metasync" ]; then
+  echo "----------------------------------------------------------------------------"
+  echo "Fetching operator metdata"
+  OP_OPERATOR_META_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-operator-prod-operator-metadata"
+  clone_repo "${OP_OPERATOR_META_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-operator-prod-operator-metadata" "${OP_OPERATOR_METADATA_DIST_GIT_BRANCH}"
+    
+  exit 0
+fi
+
 # sync pipelines repo
 PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
 IGNORE_IMAGE_SYNC=("nop gsutil")

@@ -9,7 +9,7 @@ DIST_GIT_DIR="${WORKSPACE_DIR}/dist-git"
 
 # Build pipeline flags
 push_enabled=true          # Enable push to dist-git repos
-force_build_enabled=true
+force_build_enabled=false
 
 # Specify partial dist-git URL
 OP_DIST_GIT_URL="ssh://${USER}@pkgs.devel.redhat.com/containers"

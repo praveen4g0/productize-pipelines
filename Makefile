@@ -18,4 +18,4 @@ complete-release:
 	./release.py -bri true -ucsv true -bm true
 
 enable-operator:
-	./enable-operator.sh
+	./release.py -eo true

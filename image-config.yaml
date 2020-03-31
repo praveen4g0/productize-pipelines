@@ -83,7 +83,7 @@ components:
   
   operator:
   - brew-package: openshift-pipelines-rhel8-operator-container
-    name: pipelines-operator-rhel8
+    name: pipelines-rhel8-operator
     replace: openshift-pipelines-operator
     dir: openshift-pipelines-operator
     pipeline_version: 0.10.1
@@ -97,7 +97,8 @@ registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-1
 
 mirror:
   from-registry: registry-proxy.engineering.redhat.com
-  from-org: rh-osbs/openshift-pipelines-10-tech-preview-
+  from-org: rh-osbs
+  from-image-prefix: openshift-pipelines-10-tech-preview-
   to-registry: default-route-openshift-image-registry.apps-crc.testing
   to-org: openshift-pipelines-10-tech-preview
   parallel: 3
