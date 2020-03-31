@@ -56,7 +56,8 @@ or
   <img width="100%" height="100%" src="image/build-flow.png">
 </p>
 
-1) **Sync source**: Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section. (point 1)
+1) **Sync source**: Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section. 
+Just ensure that [config.sh](./config.sh) has the right upstream/midstream branch names (point 1)
 2) **Test Container builds**: Start executing scratch containers build for all these repositories, to ensure all containers are getting build successfully. Follow [Test Containers Builds](#test-container-builds) section. (point 2)
 3) **Build & Release Images**: Start executing containers build for all these repositories. Resultant container images get available at brew image registry. These images will be used for the actual release. Follow [Build Images](#build-release-images) section. (point 3)
 4) **Publish the Operator**: Populate the operator CSV manifests to refer images built form the last step. Manifest is present `operator-metadata` `dist-git` repo. Then publish the Operator manifest(CSV & package) by building the metadata container. Follow [Publish Operator](#publish-operator) section. (point 4 and 5)
