@@ -56,11 +56,10 @@ or
   <img width="100%" height="100%" src="image/build-flow.png">
 </p>
 
-1) Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section.
-2) Start executing scratch containers build for all these repositories, to ensure all containers are getting build successfully. Follow [Test Containers Builds](#test-container-builds) section.
-3) Start executing containers build for all these repositories. Resultant container images get available at brew image registry. These images will be used for the actual release. Follow [Build Images](#build-images) section.
-4) Populate the operator CSV manifests to refer images build form the last step. Manifest is present `operator-metadata` `dist-git` repo. This is already take care by [Build Images](#build-images). However If someone has already build images or you just want to reflect the image reference without build its, follow [Refelct Images SHA in operator CSV](#refelct-images-sha-in-operator-csv) section.
-5) Commit and push the CSV changes to `dist-git` repo. Build the `operator-metadata` image to publish the CSV manifest to `quay` application registry. Follow [Build Operator Meta](#build-operator-meta) section.
+1) **Sync source**: Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section. (point 1)
+2) **Test Container builds**: Start executing scratch containers build for all these repositories, to ensure all containers are getting build successfully. Follow [Test Containers Builds](#test-container-builds) section. (point 2)
+3) **Build & Release Images**: Start executing containers build for all these repositories. Resultant container images get available at brew image registry. These images will be used for the actual release. Follow [Build Images](#build-release-images) section. (point 3)
+4) **Publish the Operator**: Populate the operator CSV manifests to refer images built form the last step. Manifest is present `operator-metadata` `dist-git` repo. Then publish the Operator manifest(CSV & package) by building the metadata container. Follow [Publish Operator](#publish-operator) section. (point 4 and 5)
 
 
 ### Sync Source Code
@@ -75,27 +74,30 @@ To test containers build, brew allows executing the scratch build where build ar
 make test-image-builds
 ```
 
-### Build Images
+### Build Release Images
 To build images that can be used for actual testing and release to stage, prod environment execute
 
 ```
 make release-images
 ```
 
-### Refelct Images SHA in operator CSV
+### Publish Operator
+It refelcts latest container images URL into CSV file and publish the operator metadata to `pre-staging` env
 ```
-make update-csv-image-ref
+make publish-operator
 ```
 
-### Build Operator Meta
+### Refelct Images SHA in operator CSV
+If someone has already build images or you just want to reflect the image reference without building all images again, then invoke [Refelct Images SHA in operator CSV](#refelct-images-sha-in-operator-csv) target and [Publish Operator](#publish-operator) target.
+
 ```
-make release-meta
+make update-csv-image-ref
 ```
 
 ## Testing OpenSift Pipelines through Operator
 
 ### Prerequisite
-1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user
+1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
 2) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
 3) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL
 4) Log into `OpenShift registry` using `oc registry login --insecure=true`
@@ -105,9 +107,9 @@ make release-meta
   <img width="100%" height="100%" src="image/test-flow.png">
 </p>
 
-1) Make sure operator manifests are published to the quay application registry from previous build flow steps. If not then no worries, one of the following step ensures that.
+1) Make sure operator manifests are published to the quay application registry from previous build flow [steps (step-4. Publish Operator)](#publish-operator). If your intend is to test the operator then dont worry about this step, assume that developer has published an operator.  (point 1)
 
-2) The operator manifests bundle is present in `quay.io` application repository which has limited access (check [Prerequisites](#prerequisites)). To access the operator metadata, a user needs to obtain the quay `token` and needs to create `secret` in the OpenShift cluster. 
+2) The operator manifests bundle is present in `quay.io` application repository which has limited access (check [Prerequisites](#prerequisites)). To access the operator metadata, a user needs to obtain the quay `token` and needs to create `secret` in the OpenShift cluster. (point 2)
     ```
     TOKEN=$(curl -sH "Content-Type: application/json" -XPOST https://quay.io/cnr/api/v1/users/login -d '
     {
@@ -124,20 +126,11 @@ make release-meta
     ```
     oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
     ```
-3) All the images built in the previous section are present in brew's registry which could be accessed over RH VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Follow [Publish Operator](#publish-operator) section. The reason it called `publish operator` because it gets the latest build images SHA, updates CSV, commit changes to dist git, publishes the operator metadata to quay registry and mirrors those images to target OpenShift cluster. 
-If image mirroring fails, run the make target again until you see no errors. 
-4) Create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle. 
-`OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section.
+3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle. 
+`OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section for all this. (point 3 and 4)
 5) Subscribe to the `OpenShift Pipelines Operator` and it will spin up all pipelines resources in the OpenShift Cluster.
 
-
 🎉 tada!
-
-
-### Publish Operator
-```
-make publish-operator
-```
 
 ### Enable Operator
 ```

@@ -8,11 +8,11 @@ test-image-builds:
 release-images:
 	./release.py -bri true
 
-update-csv-image-ref:
-	./release.py -ucsv true
-
 publish-operator:
 	./release.py -ucsv true -bm true
+
+update-csv-image-ref:
+	./release.py -ucsv true
 
 complete-release:
 	./release.py -bri true -ucsv true -bm true
