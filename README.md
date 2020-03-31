@@ -6,6 +6,18 @@
 * python 3.7+ and pip
 * Get access to quay aplication repositories, so you can [test the OpenShift pipelines operator](#testing-opensift-pipelines-through-operator). Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
 
+## Customize your "workspace"
+
+You can customize some element of this by using environment
+variables. One use case would be to use `direnv` and have an `.envrc`
+looking like the following:
+
+```bash
+export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/hshinde/productize-pipelines
+export WORKSPACE_DIR=${HOME}/src/p12n
+export USER=vdemeest
+```
+
 ### Setup 
 * Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`
 
@@ -130,17 +142,4 @@ make publish-operator
 ### Enable Operator
 ```
 make enable-operator
-```
-
-
-## Customize your "workspace"
-
-You can customize some element of this by using environment
-variables. One use case would be to use `direnv` and have an `.envrc`
-looking like the following:
-
-```bash
-export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/hshinde/productize-pipelines
-export WORKSPACE_DIR=${HOME}/src/p12n
-export USER=vdemeest
 ```
