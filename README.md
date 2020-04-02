@@ -98,10 +98,11 @@ make update-csv-image-ref
 ## Testing OpenSift Pipelines through Operator
 
 ### Prerequisite
-1) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
-2) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
-3) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL
-4) Log into `OpenShift registry` using `oc registry login --insecure=true`
+1. Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
+2. Create a namespace defined as per the [.mirror.from-image-prefix](./image-config.yaml) config (without the dash at the end)
+3. Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL.
+If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
+4. Log into `OpenShift registry` using `oc registry login --insecure=true`
 
 ### Flow
 <p align="center">
