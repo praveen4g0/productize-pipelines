@@ -48,6 +48,7 @@ export USER=vdemeest
   - `registry`: Used to deftimine image registry org while forming an image URL
   - `mirror`: In generel image mirroring configuration
   - `mirror.parallel`: Control's number of parallel mirroring jobs to execute
+  - `mirror.retry`: Defines number of retry attempts if immage mirroring fails 
 
 
 ## Build Pipeline, Trigger, Operator images Flow Overview

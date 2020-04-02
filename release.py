@@ -61,15 +61,21 @@ def exist(env, envVars):
             return i
     return -1
 
-def mirror_image(from_img, to_img):
-    print('Mirroring image {from_img} ---> {to_img}'.format(from_img=from_img, to_img=to_img))
+def mirror_image(from_img, to_img, occurence, limit):
+    print('Mirroring image {from_img} ---> {to_img} : Attempt {occurence}'.format(from_img=from_img, to_img=to_img, occurence=occurence))
     print_line()
     command = 'oc image mirror --insecure {from_img} {to_img}'.format(from_img=from_img, to_img=to_img)
     proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
     (status, err) = proc.communicate()
     if not status and err:
-        print('Failed to mirror images')
+        print('Failed to mirror image')
         print(err.decode())
+        if occurence < limit:
+            print('Trying again to mirror an image')
+            print_line()
+            occurence +=1
+            mirror_image(from_img, to_img, occurence, limit)
+            return 
         print_line()
         raise Exception('Failed mirroring')
     
@@ -242,7 +248,7 @@ if __name__ == "__main__":
                 image = image_url['value'].split('/')[2]
                 from_img = mirror['from-registry'] + '/' + mirror['from-org'] + '/' + mirror['from-image-prefix'] + image
                 to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + image.split('@')[0] + ':latest'
-                future = executor.submit(mirror_image, from_img, to_img)
+                future = executor.submit(mirror_image, from_img, to_img, 1, mirror['retry'])
                 mirror_threads.append(future)
                     
             for future in concurrent.futures.as_completed(mirror_threads):
