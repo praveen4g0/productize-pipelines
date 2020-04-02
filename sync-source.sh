@@ -89,9 +89,10 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
 if [ "$1" == "metasync" ]; then
   echo "----------------------------------------------------------------------------"
   echo "Fetching operator metdata"
+  echo "----------------------------------------------------------------------------"
   OP_OPERATOR_META_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-operator-prod-operator-metadata"
   clone_repo "${OP_OPERATOR_META_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-operator-prod-operator-metadata" "${OP_OPERATOR_METADATA_DIST_GIT_BRANCH}"
-    
+
   exit 0
 fi
 

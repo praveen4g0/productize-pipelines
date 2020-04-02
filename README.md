@@ -1,24 +1,13 @@
 # OpenShift pipelines p12n setup
 
 
-### Prerequisites
-* [rhpkg](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md)
+## Prerequisites
+* [rhpkg](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md) (not needed if you're just testing the operator)
 * python 3.7+ and pip
 * Get access to quay aplication repositories, so you can [test the OpenShift pipelines operator](#testing-opensift-pipelines-through-operator). Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
 
-## Customize your "workspace"
 
-You can customize some element of this by using environment
-variables. One use case would be to use `direnv` and have an `.envrc`
-looking like the following:
-
-```bash
-export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/hshinde/productize-pipelines
-export WORKSPACE_DIR=${HOME}/src/p12n
-export USER=vdemeest
-```
-
-### Setup 
+## Setup 
 * Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`
 
 or 
@@ -26,6 +15,17 @@ or
 * Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-pipelines`
 * Then fire `./setup.sh`
 
+#### Customize your "workspace"
+
+You can customize some element of this by using environment
+variables. One use case would be to use `direnv` and have an `.envrc`
+looking like the following:
+
+```bash
+export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/tekton/productize-pipelines
+export WORKSPACE_DIR=${HOME}/src/p12n
+export USER=vdemeest
+```
 
 ## Config
 
@@ -63,32 +63,32 @@ Just ensure that [config.sh](./config.sh) has the right upstream/midstream branc
 4) **Publish the Operator**: Populate the operator CSV manifests to refer images built form the last step. Manifest is present `operator-metadata` `dist-git` repo. Then publish the Operator manifest(CSV & package) by building the metadata container. Follow [Publish Operator](#publish-operator) section. (point 4 and 5)
 
 
-### Sync Source Code
+#### Sync Source Code
 ```
 make sync-source
 ```
 
-### Test Container Builds
+#### Test Container Builds
 To test containers build, brew allows executing the scratch build where build artifacts get discarded after some time.
 
 ```
 make test-image-builds
 ```
 
-### Build Release Images
+#### Build Release Images
 To build images that can be used for actual testing and release to stage, prod environment execute
 
 ```
 make release-images
 ```
 
-### Publish Operator
+#### Publish Operator
 It refelcts latest container images URL into CSV file and publish the operator metadata to `pre-staging` env
 ```
 make publish-operator
 ```
 
-### Refelct Images SHA in operator CSV
+#### Refelct Images SHA in operator CSV
 If someone has already build images or you just want to reflect the image reference without building all images again, then invoke [Refelct Images SHA in operator CSV](#refelct-images-sha-in-operator-csv) target and [Publish Operator](#publish-operator) target.
 
 ```
@@ -98,11 +98,11 @@ make update-csv-image-ref
 ## Testing OpenSift Pipelines through Operator
 
 ### Prerequisite
-1. Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
-2. Create a namespace defined as per the [.mirror.from-image-prefix](./image-config.yaml) config (without the dash at the end)
-3. Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL.
-If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
-4. Log into `OpenShift registry` using `oc registry login --insecure=true`
+1) Make sure all [prerequisites](#prerequisites) are in place (except `rhpkg`) and [setup](#setup) is done correctly.
+2) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
+3) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
+4) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL. If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
+5) Log into `OpenShift registry` using `oc registry login --insecure=true`
 
 ### Flow
 <p align="center">
@@ -134,7 +134,7 @@ If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/c
 
 🎉 tada!
 
-### Enable Operator
+#### Enable Operator
 ```
 make enable-operator
 ```
