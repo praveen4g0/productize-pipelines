@@ -70,7 +70,7 @@ def mirror_image(from_img, to_img, occurence, limit):
     if not status and err:
         print('Failed to mirror image')
         print(err.decode())
-        if occurence < limit:
+        if occurence <= limit:
             print('Trying again to mirror an image')
             print_line()
             occurence +=1
