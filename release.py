@@ -87,8 +87,8 @@ if __name__ == "__main__":
     parser.add_argument('-bm', '--build-metadata', help='Want to build metadata, true if yes default is false', type=bool, default=False)
     parser.add_argument('-eo', '--enable-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
     args = parser.parse_args()
-    script_dir = os.getcwd()
-    super_dir = Path(script_dir).parent
+    script_dir = os.environ['SCRIPT_DIR'] if 'SCRIPT_DIR' in os.environ else os.getcwd()
+    workspace_dir = os.environ['WORKSPACE_DIR'] if 'WORKSPACE_DIR' in os.environ else Path(script_dir).parent
 
     #load config
     with open('image-config.yaml', 'r') as stream:
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     #start building images
     if args.build_release_images:
-        os.chdir('{root}/dist-git'.format(root=super_dir))
+        os.chdir('{root}/dist-git'.format(root=workspace_dir))
         dist_git_dir = os.getcwd()
         
         build_threads = []
@@ -143,7 +143,7 @@ if __name__ == "__main__":
                 print_line()
 
         #update operator csv manifest
-        os.chdir('{root}/dist-git'.format(root=super_dir))
+        os.chdir('{root}/dist-git'.format(root=workspace_dir))
         dist_git_dir = os.getcwd()
         operator_meata = release_config['operator-meta']
         os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meata['dir']))
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         print_line()
 
         operator_meta = release_config['operator-meta']
-        os.chdir('{root}/dist-git/{dir}'.format(root = super_dir, dir = operator_meta['dir']))
+        os.chdir('{root}/dist-git/{meta}'.format(root = workspace_dir, meta = operator_meta['dir']))
         with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r') as csv_stream:
             try:
                 csv = yaml.safe_load(csv_stream)
