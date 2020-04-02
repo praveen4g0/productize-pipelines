@@ -17,17 +17,17 @@ function sync_components_source() {
   local ignore_components_sync=$8
  
   OP_UPSTREAM_WORKSPACE=${UPSTREAM_DIR}/${upstream_repo_name}
-  echo "----------------------------------------------------------------------------"
+  print_line
   echo "Fething upstream ${OP_UPSTREAM_WORKSPACE}"
-  echo "----------------------------------------------------------------------------"
+  print_line
   UPSTREAM_COMMIT=$(clone_repo "${OP_UPSTREAM_WORKSPACE}" "${upstream_repo}" "${upstream_branch}")
   
   for IMAGE in ${dist_git_components}
   do
     OP_DIST_GIT_WORKSPACE=${DIST_GIT_DIR}/${dist_git_repo_prefix}${IMAGE}
-    echo "----------------------------------------------------------------------------"
+    print_line
     echo "Sync ${dist_git_repo_prefix}${IMAGE}"
-    echo "----------------------------------------------------------------------------"
+    print_line
     
     echo "Cloning ${OP_DIST_GIT_URL}/${dist_git_repo_prefix}${IMAGE}"
     clone_repo "${OP_DIST_GIT_WORKSPACE}" "${OP_DIST_GIT_URL}/${dist_git_repo_prefix}${IMAGE}" "${dist_git_branch}"
@@ -81,15 +81,15 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
     rhpkg push
     
     echo "Sync (commit && push) for ${IMAGE} is completed \o/"
-    echo "----------------------------------------------------------------------------"
+    print_line
 
   done
 }
 
 if [ "$1" == "metasync" ]; then
-  echo "----------------------------------------------------------------------------"
+  print_line
   echo "Fetching operator metdata"
-  echo "----------------------------------------------------------------------------"
+  print_line
   OP_OPERATOR_META_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-operator-prod-operator-metadata"
   clone_repo "${OP_OPERATOR_META_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-operator-prod-operator-metadata" "${OP_OPERATOR_METADATA_DIST_GIT_BRANCH}"
 
@@ -109,14 +109,14 @@ sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers"
 OPERATOR_COMPONENTS=("operator")
 sync_components_source "${OPO_UPSTREAM_URL}" "${OPO_UPSTREAM_BRANCH}" "operator" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${OPERATOR_COMPONENTS}"
 
-echo "----------------------------------------------------------------------------"
+print_line
 echo "Cloning buildah image"
-echo "----------------------------------------------------------------------------"
+print_line
 BUILDAH_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-catalog-buildah"
 clone_repo "${BUILDAH_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-catalog-buildah" "${OP_DIST_GIT_BRANCH}"
 
-echo "----------------------------------------------------------------------------"
+print_line
 echo "Cloning operator metdata"
-echo "----------------------------------------------------------------------------"
+print_line
 OP_OPERATOR_META_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-operator-prod-operator-metadata"
 clone_repo "${OP_OPERATOR_META_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-operator-prod-operator-metadata" "${OP_OPERATOR_METADATA_DIST_GIT_BRANCH}"

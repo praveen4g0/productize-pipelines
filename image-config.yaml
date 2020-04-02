@@ -102,3 +102,4 @@ mirror:
   to-registry: default-route-openshift-image-registry.apps-crc.testing
   to-org: openshift-pipelines-10-tech-preview
   parallel: 3
+  retry: 5
