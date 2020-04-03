@@ -61,8 +61,8 @@ def exist(env, envVars):
             return i
     return -1
 
-def mirror_image(from_img, to_img, occurence, limit):
-    print('Mirroring image {from_img} ---> {to_img} : Attempt {occurence}'.format(from_img=from_img, to_img=to_img, occurence=occurence))
+def mirror_image(from_img, to_img, attempt, limit):
+    print('Mirroring image {from_img} ---> {to_img} : Attempt {attempt}'.format(from_img=from_img, to_img=to_img, attempt=attempt))
     print_line()
     command = 'oc image mirror --insecure {from_img} {to_img}'.format(from_img=from_img, to_img=to_img)
     proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
@@ -70,11 +70,11 @@ def mirror_image(from_img, to_img, occurence, limit):
     if not status and err:
         print('Failed to mirror image')
         print(err.decode())
-        if occurence <= limit:
+        if attempt <= limit:
             print('Trying again to mirror an image')
             print_line()
-            occurence +=1
-            mirror_image(from_img, to_img, occurence, limit)
+            attempt +=1
+            mirror_image(from_img, to_img, attempt, limit)
             return 
         print_line()
         raise Exception('Failed mirroring')
@@ -269,8 +269,3 @@ if __name__ == "__main__":
             sys.exit(1)
         print(status.decode())
         print_line()
-
-
-
-
-
