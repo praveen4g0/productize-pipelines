@@ -56,33 +56,41 @@ function sync_components_source() {
         "${OP_DIST_GIT_WORKSPACE}"/
     fi
 
+    local dirty=false
     # Commit the changes
     cd "${OP_DIST_GIT_WORKSPACE}"
 
     git add .
-
     if local output=$(git status --porcelain) && [ -z "$output" ]; then
       echo "No changes to commit..."
-      continue
-    fi
-
-    echo "Import latest from upstream ${upstream_branch}
+    else
+      echo "Import latest from upstream ${upstream_branch}
 
 Using commit ${UPSTREAM_COMMIT}
 from ${upstream_repo}, branch ${upstream_branch}" | \
-    git commit -F -
+      git commit -F -
+      dirty=true
+    fi
+
+    if commits_to_push; then
+      echo "Pending some commits on local repository"
+      dirty=true
+    fi
 
     if ! ${push_enabled}; then
       echo "Skipping git push..."
       continue
     fi
 
-    echo "Pushing the commits for ${OP_DIST_GIT_WORKSPACE}..."
-    rhpkg push
-    
-    echo "Sync (commit && push) for ${IMAGE} is completed \o/"
+    if ${dirty}; then
+      echo "Pushing the commits/changes for ${OP_DIST_GIT_WORKSPACE}..."
+      rhpkg push
+      echo "Sync (commit && push) for ${IMAGE} is completed \o/"
+    else 
+      echo "Repository is clean, no changes needed"
+    fi
+      
     print_line
-
   done
 }
 
