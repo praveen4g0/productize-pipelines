@@ -8,12 +8,15 @@
 
 
 ## Setup 
-* Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`
+* Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`.
+It will clone the repo to `$HOME/work/op-p12n/productize-pipelines`, installs the required script dependencies(python packages and RPMS)
 
 or 
 
 * Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-pipelines`
-* Then fire `./setup.sh`
+* Then fire `./setup.sh` to install the required script dependencies(python packages and RPMS)
+* You could set envionment variables to [customize your workspace](#customize-your-"workspace")
+ 
 
 #### Customize your "workspace"
 
@@ -48,7 +51,7 @@ export USER=vdemeest
   - `registry`: Used to deftimine image registry org while forming an image URL
   - `mirror`: In generel image mirroring configuration
   - `mirror.parallel`: Control's number of parallel mirroring jobs to execute
-  - `mirror.retry`: Defines number of retry attempts if immage mirroring fails 
+  - `mirror.retry`: Defines number of retry attempts if image mirroring fails 
 
 
 ## Build Pipeline, Trigger, Operator images Flow Overview
@@ -97,13 +100,14 @@ make update-csv-image-ref
 ```
 
 ## Testing OpenSift Pipelines through Operator
-
+**Note: As of now this could work for Linux host only**
 ### Prerequisite
 1) Make sure all [prerequisites](#prerequisites) are in place (except `rhpkg`) and [setup](#setup) is done correctly.
-2) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command
-3) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config
-4) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL. If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
-5) Log into `OpenShift registry` using `oc registry login --insecure=true`
+2) [Kerberos setup](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md#setup) is done and SSO is working by executing `$ kinit && klist`. (Needs VPN connection)
+3) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command. Please also make sure, `oc` binary is up to the date
+4) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config. e.g. `oc create ns openshift-pipelines-10-tech-preview`
+5) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL. If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
+6) Log into `OpenShift registry` using `oc registry login --insecure=true`
 
 ### Flow
 <p align="center">
