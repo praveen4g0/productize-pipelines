@@ -7,16 +7,16 @@
 * Get access to quay aplication repositories, so you can [test the OpenShift pipelines operator](#testing-opensift-pipelines-through-operator). Please use this [doc](https://docs.google.com/spreadsheets/d/1OyUtbu9aiAi3rfkappz5gcq5FjUbMQtJG4jZCNqVT20/edit#gid=0) or follow the [guide](https://mojo.redhat.com/docs/DOC-1202657). It might take day or some hours to get you an access.
 
 
-## Setup 
+## Setup
 * Execute `curl https://gist.githubusercontent.com/hrishin/90e7df87263c03801546ded814cd2947/raw/120f4004fe28dc61558daf29b3221cadc5e88f15/p12n-setup | bash`.
 It will clone the repo to `$HOME/work/op-p12n/productize-pipelines`, installs the required script dependencies(python packages and RPMS)
 
-or 
+or
 
 * Execute `git clone git@gitlab.cee.redhat.com:tekton/productize-pipelines.git $HOME/work/op-p12n/productize-pipelines`
 * Then fire `./setup.sh` to install the required script dependencies(python packages and RPMS)
 * You could set envionment variables to [customize your workspace](#customize-your-"workspace")
- 
+
 
 #### Customize your "workspace"
 
@@ -28,22 +28,32 @@ looking like the following:
 export SCRIPT_DIR=${HOME}/src/gitlab.cee.redhat.com/tekton/productize-pipelines
 export WORKSPACE_DIR=${HOME}/src/p12n
 export USER=vdemeest
+# For QUAY
+export QUAY_USERNAME=rh-osbs-operators+${USER}
+export QUAY_TOKEN=%REDACTED%
+export TOKEN=$(curl -sH "Content-Type: application/json" -XPOST https://quay.io/cnr/api/v1/users/login -d '
+{
+  "user": {
+    "username": "'"${QUAY_USERNAME}"'",
+    "password": "'"${QUAY_TOKEN}"'"
+  }
+}' | jq -r '.token')
 ```
 
 ## Config
 
-* **[config.sh](./config.sh)**: 
+* **[config.sh](./config.sh)**:
   - This file holds the general configuration about cloning and sync the source code. `*_UPSTREAM_URL` and `*_UPSTREAM_BRANCH` holds upstream pipeline's, trigger's, operator's repo URL and branch to clone.
-* **[image-config.yaml](./image-config.yaml)**: 
+* **[image-config.yaml](./image-config.yaml)**:
   - This file holds the configuration for building and mirroring images for pipelines, triggers, operators, operator's metadata and catalog components.
-  - `replace`: This attribute determines how to generate `ENV` var for operator's container image, so images could be overriden as per the [operator configuration](https://github.com/openshift/tektoncd-pipeline-operator#override-images). Example 
+  - `replace`: This attribute determines how to generate `ENV` var for operator's container image, so images could be overriden as per the [operator configuration](https://github.com/openshift/tektoncd-pipeline-operator#override-images). Example
      ```
      components:
       pipelines:
       - brew-package: openshift-pipelines-controller-rhel8-container
         name: pipelines-controller-rhel8
         replace: tekton-pipelines-controller
-     ``` 
+     ```
      `ENV` var gets generated here is like `PIPELINES_TEKTON_PIPELINES_CONTROLLER`. i.e. `<component name>_<replace>`
   - `brew-package`: Is used to fetch build info by package name
   - `dir`: Is the components directory. Used when bulding an image using `rhpkg`
@@ -51,7 +61,7 @@ export USER=vdemeest
   - `registry`: Used to deftimine image registry org while forming an image URL
   - `mirror`: In generel image mirroring configuration
   - `mirror.parallel`: Control's number of parallel mirroring jobs to execute
-  - `mirror.retry`: Defines number of retry attempts if image mirroring fails 
+  - `mirror.retry`: Defines number of retry attempts if image mirroring fails
 
 
 ## Build Pipeline, Trigger, Operator images Flow Overview
@@ -60,7 +70,7 @@ export USER=vdemeest
   <img width="100%" height="100%" src="image/build-flow.png">
 </p>
 
-1) **Sync source**: Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section. 
+1) **Sync source**: Sync source code(midstream) into pipelines, triggers and task catalog containers `dist-git` repositories(source code sync). Follow [Sync Source Code](#sync-source-code) section.
 Just ensure that [config.sh](./config.sh) has the right upstream/midstream branch names (point 1)
 2) **Test Container builds**: Start executing scratch containers build for all these repositories, to ensure all containers are getting build successfully. Follow [Test Containers Builds](#test-container-builds) section. (point 2)
 3) **Build & Release Images**: Start executing containers build for all these repositories. Resultant container images get available at brew image registry. These images will be used for the actual release. Follow [Build Images](#build-release-images) section. (point 3)
@@ -133,11 +143,23 @@ make update-csv-image-ref
     ```
     oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
     ```
-3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle. 
+3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle.
 `OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section for all this. (point 3 and 4)
 5) Subscribe to the `OpenShift Pipelines Operator` and it will spin up all pipelines resources in the OpenShift Cluster.
 
 🎉 tada!
+
+You can use `./install-productized-operator.sh` if you are using
+`direnv` and a `.envrc`, *or* setuping the required environment
+variable prior to execute the script:
+
+- `USER`
+- `QUAY_USERNAME`
+- `QUAY_TOKEN`
+- `TOKEN`
+
+You also need to ensure you did log in to your cluster before running
+the script (`oc login …`).
 
 #### Enable Operator
 ```
