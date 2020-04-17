@@ -25,7 +25,7 @@ components:
   - brew-package: openshift-pipelines-git-init-rhel8-container
     name: pipelines-git-init-rhel8
     replace: arg_-git-image
-    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-git-init/plain/repo.repo?h=pipelines-1.0-rhel-8"
+    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-git-init/plain/repo.repo?h=pipelines-1.0-rhel-8
     dir: openshift-pipelines-git-init
 
   - brew-package: openshift-pipelines-gcs-fetcher-rhel8-container
