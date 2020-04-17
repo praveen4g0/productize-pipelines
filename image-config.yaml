@@ -58,7 +58,7 @@ components:
     name: pipelines-nop-rhel8
     replace: arg_-nop-image
     dir: openshift-pipelines-nop
-  
+
   triggers:
   - brew-package: openshift-pipelines-triggers-controller-rhel-8-container
     name: pipelines-triggers-controller-rhel8
@@ -70,24 +70,24 @@ components:
     replace: webhook
     dir: openshift-pipelines-triggers-webhook
 
-  - brew-package: openshift-pipelines-triggers-eventlistenersink-rhel-8-container 
+  - brew-package: openshift-pipelines-triggers-eventlistenersink-rhel-8-container
     name: pipelines-triggers-eventlistenersink-rhel8
     replace: arg_-el-image
     dir: openshift-pipelines-triggers-eventlistenersink
-  
+
   addons:
   - brew-package: openshift-pipelines-catalog-buildah-rhel8-container
     name: pipelines-catalog-buildah-rhel8
     replace: param_builder_image
     repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-catalog-buildah/plain/repo.repo?h=pipelines-1.0-rhel-8
     dir: openshift-pipelines-catalog-buildah
-  
+
   operator:
   - brew-package: openshift-pipelines-rhel8-operator-container
     name: pipelines-rhel8-operator
     replace: openshift-pipelines-operator
     dir: openshift-pipelines-operator
-    pipeline_version: 0.10.1
+    pipeline_version: 0.11.1
 
 operator-meta:
   brew-package: openshift-pipelines-operator-1-tech-preview-pipelines-rhel8-operator-metadata-container
