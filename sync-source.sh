@@ -18,7 +18,7 @@ function sync_components_source() {
  
   OP_UPSTREAM_WORKSPACE=${UPSTREAM_DIR}/${upstream_repo_name}
   print_line
-  echo "Fething upstream ${OP_UPSTREAM_WORKSPACE}"
+  echo "Fetching upstream ${OP_UPSTREAM_WORKSPACE}"
   print_line
   UPSTREAM_COMMIT=$(clone_repo "${OP_UPSTREAM_WORKSPACE}" "${upstream_repo}" "${upstream_branch}")
   
@@ -96,7 +96,7 @@ from ${upstream_repo}, branch ${upstream_branch}" | \
 
 if [ "$1" == "metasync" ]; then
   print_line
-  echo "Fetching operator metdata"
+  echo "Fetching operator metadata"
   print_line
   OP_OPERATOR_META_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-operator-prod-operator-metadata"
   clone_repo "${OP_OPERATOR_META_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-operator-prod-operator-metadata" "${OP_OPERATOR_METADATA_DIST_GIT_BRANCH}"

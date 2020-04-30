@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
         operator_meta = release_config['operator-meta']
         os.chdir('{root}/dist-git/{meta}'.format(root = workspace_dir, meta = operator_meta['dir']))
-        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r') as csv_stream:
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['csv-semver']), 'r') as csv_stream:
             try:
                 csv = yaml.safe_load(csv_stream)
             except yaml.YAMLError as exc:
