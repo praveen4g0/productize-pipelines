@@ -9,7 +9,7 @@ release-images:
 	./release.py -bri true
 
 publish-operator:
-	./release.py -ucsv true -bm true
+	./release.py -bm true
 
 update-csv-image-ref:
 	./release.py -ucsv true
