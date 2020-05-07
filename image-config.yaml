@@ -1,5 +1,5 @@
 version: 1.0.0
-csv-semver: 1.0.0-rc1
+csv-semver: 1.0.0-rc3
 
 components:
   pipelines:
@@ -95,13 +95,14 @@ operator-meta:
   name: openshift-pipelines-rhel8-operator-metadata
   dir: openshift-pipelines-operator-prod-operator-metadata
 
-registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-10-tech-preview/
+registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-tech-preview/
 
 mirror:
   from-registry: registry-proxy.engineering.redhat.com
   from-org: rh-osbs
-  from-image-prefix: openshift-pipelines-10-tech-preview-
+  from-image-prefix: openshift-pipelines-tech-preview-
   to-registry: default-route-openshift-image-registry.apps-crc.testing
-  to-org: openshift-pipelines-10-tech-preview
+  to-org: openshift-pipelines-tech-preview
   parallel: 3
   retry: 5
+

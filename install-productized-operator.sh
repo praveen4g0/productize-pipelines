@@ -18,8 +18,8 @@ ROUTE=$(oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.ho
 echo "Login to registry"
 oc registry login --insecure=true
 
-echo "Create openshift-pipelines-10-tech-preview namespace"
-oc create ns openshift-pipelines-10-tech-preview || true
+echo "Create openshift-pipelines-tech-preview namespace"
+oc create ns openshift-pipelines-tech-preview || true
 
 echo "Create pre-stage-operators-secret"
 oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace || true
