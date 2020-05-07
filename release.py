@@ -153,7 +153,7 @@ if __name__ == "__main__":
         dist_git_dir = os.getcwd()
         operator_meata = release_config['operator-meta']
         os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meata['dir']))
-        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['version']), 'r+') as csv_stream:
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['csv-semver']), 'r+') as csv_stream:
             try:
                 csv = yaml.safe_load(csv_stream)
                 deployment = csv['spec']['install']['spec']['deployments'][0]

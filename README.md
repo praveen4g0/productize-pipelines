@@ -115,7 +115,7 @@ make update-csv-image-ref
 1) Make sure all [prerequisites](#prerequisites) are in place (except `rhpkg`) and [setup](#setup) is done correctly.
 2) [Kerberos setup](https://gitlab.cee.redhat.com/tekton/team-docs/blob/master/productisation/PREREQUISITE.md#setup) is done and SSO is working by executing `$ kinit && klist`. (Needs VPN connection)
 3) Make sure you have access to any OpenShift 4 cluster and logged in as a `admin` user by `oc login` command. Please also make sure, `oc` binary is up to the date
-4) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config. e.g. `oc create ns openshift-pipelines-10-tech-preview`
+4) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config. e.g. `oc create ns openshift-pipelines-tech-preview`
 5) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL. If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
 6) Log into `OpenShift registry` using `oc registry login --insecure=true`
 
@@ -143,7 +143,7 @@ make update-csv-image-ref
     ```
     oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
     ```
-3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-10-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle.
+3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle.
 `OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section for all this. (point 3 and 4)
 5) Subscribe to the `OpenShift Pipelines Operator` and it will spin up all pipelines resources in the OpenShift Cluster.
 
