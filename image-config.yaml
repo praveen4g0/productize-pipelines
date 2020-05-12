@@ -1,5 +1,5 @@
 version: 1.0.0
-csv-semver: 1.0.0-rc4
+csv-semver: 1.0.0
 
 components:
   pipelines:
@@ -33,12 +33,6 @@ components:
     name: pipelines-gcs-fetcher-rhel8
     replace: arg_-build-gcs-fetcher-image
     dir: openshift-pipelines-gcs-fetcher
-
-  - brew-package: openshift-pipelines-gsutil-rhel8-container
-    name: pipelines-gsutil-rhel8
-    replace: arg_-gsutil-image
-    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-gsutil/plain/.oit/signed.repo?h=pipelines-1.0-rhel-8
-    dir: openshift-pipelines-gsutil
 
   - brew-package: openshift-pipelines-imagedigestexporter-rhel8-container
     name: pipelines-imagedigestexporter-rhel8
@@ -76,12 +70,7 @@ components:
     replace: arg_-el-image
     dir: openshift-pipelines-triggers-eventlistenersink
 
-  addons:
-  - brew-package: openshift-pipelines-catalog-buildah-rhel8-container
-    name: pipelines-catalog-buildah-rhel8
-    replace: param_builder_image
-    repo-url: http://pkgs.devel.redhat.com/cgit/containers/openshift-pipelines-catalog-buildah/plain/repo.repo?h=pipelines-1.0-rhel-8
-    dir: openshift-pipelines-catalog-buildah
+  addons: []
 
   operator:
   - brew-package: openshift-pipelines-rhel8-operator-container
