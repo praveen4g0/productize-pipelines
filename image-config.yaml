@@ -81,7 +81,7 @@ components:
 
 operator-meta:
   brew-package: openshift-pipelines-operator-1-tech-preview-pipelines-rhel8-operator-metadata-container
-  name: openshift-pipelines-rhel8-operator-metadata
+  name: pipelines-operator-metadata-rhel8
   dir: openshift-pipelines-operator-prod-operator-metadata
 
 registry: image-registry.openshift-image-registry.svc:5000/openshift-pipelines-tech-preview/
