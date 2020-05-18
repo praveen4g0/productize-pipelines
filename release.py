@@ -250,7 +250,7 @@ if __name__ == "__main__":
                 to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + image.split('@')[0] + ':latest'
                 future = executor.submit(mirror_image, from_img, to_img, 1, mirror['retry'])
                 mirror_threads.append(future)
-                    
+
             for future in concurrent.futures.as_completed(mirror_threads):
                 if future.exception():
                     failed_mirrors+= 1

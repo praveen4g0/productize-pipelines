@@ -5,7 +5,7 @@ metadata:
   namespace: openshift-marketplace
 spec:
   authorizationToken:
-      secretName: pre-stage-operators-secret
+      secretName: operators-source-pull-secret
   endpoint: https://quay.io/cnr
   registryNamespace: rh-osbs-operators
   type: appregistry
