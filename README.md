@@ -118,8 +118,17 @@ make update-csv-image-ref
 4) Create a namesapce definde as per the [.mirror.to-namespace](./image-config.yaml) config. e.g. `oc create ns openshift-pipelines-tech-preview`
 5) Reflect the correct internal `OpenShift registry` URL in [.mirror.to-registry](./image-config.yaml) config. Execute `oc get route -n openshift-image-registry -o=jsonpath='{.items[0].spec.host}'` to get the registry URL. If it's not exposed, run `oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge`
 6) Log into `OpenShift registry` using `oc registry login --insecure=true`
+7) while working witn stagging, make sure you have access to registry.stage.redhat.io by registering at https://access.stage.redhat.com
+8) set following environment variables
+   - ENVSTAGE : `pre-stage` for pre-stagging, `stage` for stagging
+   - STAGE_USER : (while working with stagging only) username for https://access.stage.redhat.com
+   - STAGE_PASS : (while working with stagging only) password for https://access.stage.redhat.com
 
 ### Flow
+
+```
+shortcut: perform step 2 below (create token), then set relevant enviroment variables specified in above section and run `./install-productized-operator.sh`
+```
 <p align="center">
   <img width="100%" height="100%" src="image/test-flow.png">
 </p>
