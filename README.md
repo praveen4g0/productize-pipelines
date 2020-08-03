@@ -96,18 +96,35 @@ To build images that can be used for actual testing and release to stage, prod e
 make release-images
 ```
 
-#### Publish Operator
-It refelcts latest container images URL into CSV file and publish the operator metadata to `pre-staging` env
+
+#### Create new CSV file (if required)
+
+Each new release of the operator is packaged as a CluserServiceVersion (CSV file). If a CSV file does not exist for 
+the current release target version, then create on using the `make new-csv` target.
+
+**Note:** The new CSV file will have all image references reset to `<new image>`
+
+eg:
 ```
-make publish-operator
+CSV_VERSION=1.2.0-rc1 FROM_CSV_VERSION=1.0.1 OPERATOR_CHANNEL_NAME=preview make new-csv
 ```
 
 #### Refelct Images SHA in operator CSV
-If someone has already build images or you just want to reflect the image reference without building all images again, then invoke [Refelct Images SHA in operator CSV](#refelct-images-sha-in-operator-csv) target and [Publish Operator](#publish-operator) target.
+
+After Images are built, we need to update them in the CSV file.
 
 ```
-make update-csv-image-ref
+CSV_VERSION=1.2.0-rc1 make update-csv-image-ref
 ```
+
+#### Publish Operator
+It reflects latest container images URL into CSV file and publish the operator metadata to `pre-staging` env
+(builds and pushes the operator metadata image)
+
+```
+CSV_VERSION=1.2.0-rc1 make publish-operator
+```
+
 
 ## Testing OpenSift Pipelines through Operator
 **Note: As of now this could work for Linux host only**

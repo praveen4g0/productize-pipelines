@@ -10,6 +10,7 @@ import threading
 import time
 import argparse
 from pathlib import Path
+import shutil
 
 def print_line():
     print('-' * 100)
@@ -92,6 +93,11 @@ if __name__ == "__main__":
     parser.add_argument('-ucsv', '--update-csv', help='Want to update CSV with released images url, true if yes default is false', type=bool, default=False)
     parser.add_argument('-bm', '--build-metadata', help='Want to build metadata, true if yes default is false', type=bool, default=False)
     parser.add_argument('-eo', '--enable-operator', help='Want to perform scratch build, true if yes default is false', type=bool, default=False)
+    parser.add_argument('--new-csv', help='Create new CSV (new update) based on an existing CSV', type=bool, default=False)
+    parser.add_argument('--csv-version', help='Version of the CSV being create/processed')
+    parser.add_argument('--from-csv-version', help='Create new CSV (new update) based on an existing CSV')
+    parser.add_argument('--operator-release-channel', help='Operator Channel on which the current release will be available', default='preview')
+
     args = parser.parse_args()
     script_dir = os.environ['SCRIPT_DIR'] if 'SCRIPT_DIR' in os.environ else os.getcwd()
     workspace_dir = os.environ['WORKSPACE_DIR'] if 'WORKSPACE_DIR' in os.environ else Path(script_dir).parent
@@ -100,7 +106,8 @@ if __name__ == "__main__":
     with open('image-config.yaml', 'r') as stream:
         try:
             release_config = yaml.safe_load(stream)
-            print('Building the pipeline version : ' + release_config['version'])
+            print_line()
+            print('OpenShift Pipelines : Release : ' + release_config['version'])
             print_line()
         except yaml.YAMLError as exc:
             print(exc)
@@ -109,7 +116,7 @@ if __name__ == "__main__":
     if args.build_release_images:
         os.chdir('{root}/dist-git'.format(root=workspace_dir))
         dist_git_dir = os.getcwd()
-        
+
         build_threads = []
         failed_builds = 0
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
@@ -132,7 +139,101 @@ if __name__ == "__main__":
             print('Build tests are completed')
             sys.exit(0)
 
-    if args.build_release_images or args.update_csv:
+    if args.new_csv:
+        if not args.csv_version:
+            print('--new-csv-version not defined')
+            sys.exit(1)
+        if not args.from_csv_version:
+            print('--from-csv-version not defined')
+            sys.exit(1)
+        os.chdir('{root}/dist-git'.format(root=workspace_dir))
+        dist_git_dir = os.getcwd()
+        operator_meta = release_config['operator-meta']
+        manifest_dir = os.path.join(dist_git_dir, operator_meta['dir'], 'manifests')
+        os.chdir(manifest_dir)
+
+        from_csv_dir=os.path.join(manifest_dir, args.from_csv_version)
+        new_csv_dir=os.path.join(manifest_dir, args.csv_version)
+        shutil.copytree(from_csv_dir, new_csv_dir)
+
+        old_csv_filename = new_csv_dir + '/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver=args.from_csv_version)
+        new_csv_filename = new_csv_dir + '/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver=args.csv_version)
+        os.rename(old_csv_filename, new_csv_filename)
+
+        # reset new_csv with placedholder values
+        with open('{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver=args.csv_version), 'r+') as csv_stream:
+            try:
+                csv = yaml.safe_load(csv_stream)
+
+                #replace operators images
+                operator = release_config['components']['operator'][0]
+                operator_image = '<new image>'
+                deployment = csv['spec']['install']['spec']['deployments'][0]
+                relatedImages = []
+                for container in deployment['spec']['template']['spec']['containers']:
+                    if container['name'] != operator['replace']:
+                        continue
+                    container['image'] = operator_image
+                    image = {'name':container['name'].upper().replace('-', '_'), 'value':operator_image}
+                    relatedImages.append(image.copy())
+
+                    for name, components in release_config['components'].items():
+                        if name == 'operator':
+                            continue
+
+                        for component in components:
+                            env = 'IMAGE_' + name + '_' + component['replace']
+                            env = env.upper().replace('-', '_')
+                            value = '<new image>'
+                            envVar = {'name':env, 'value':value}
+
+                            index = exist(env, container['env'])
+                            if index != -1:
+                                container['env'][index]['value'] = value
+                            else:
+                                container['env'].append(envVar.copy())
+
+                            relatedImages.append(envVar.copy())
+
+                csv['metadata']['annotations']['containerImage'] = operator_image
+                csv['spec']['relatedImages'] = relatedImages
+                csv['spec']['version'] = args.csv_version
+                csv['metadata']['name'] = 'openshift-pipelines-operator.v' + args.csv_version
+                csv['spec']['replaces'] = 'openshift-pipelines-operator.v' + args.from_csv_version
+
+                csv_stream.seek(0)
+                csv_stream.truncate()
+                yaml.safe_dump(csv, csv_stream, default_flow_style=False)
+
+            except yaml.YAMLError as exc:
+                print(exc)
+                sys.exit(1)
+
+        # update channel spec in package.yaml file
+        with open('openshift-pipelines-operator.package.yaml', 'r+') as opr_pkg_stream:
+            try:
+                opr_pkg = yaml.safe_load(opr_pkg_stream)
+
+                for channel in opr_pkg['channels']:
+                    if channel['name'] == args.operator_release_channel:
+                        channel['currentCSV'] = 'openshift-pipelines-operator.v' + args.csv_version
+                        break
+                opr_pkg_stream.seek(0)
+                opr_pkg_stream.truncate()
+                yaml.safe_dump(opr_pkg, opr_pkg_stream, default_flow_style=False)
+
+            except yaml.YAMLError as exc:
+                print(exc)
+                sys.exit(1)
+        print("New CSV created:\n", new_csv_filename)
+        print_line()
+        exit(0)
+
+    if args.update_csv:
+        if not args.csv_version:
+            print('--new-csv-version not defined')
+            sys.exit(1)
+
         #list images
         proc = Popen(['brew list-builds --quiet --prefix="openshift-pipelines" | sort -V'], stdout=PIPE, shell=True)
         (builds, err) = proc.communicate()
@@ -151,9 +252,9 @@ if __name__ == "__main__":
         #update operator csv manifest
         os.chdir('{root}/dist-git'.format(root=workspace_dir))
         dist_git_dir = os.getcwd()
-        operator_meata = release_config['operator-meta']
-        os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meata['dir']))
-        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['csv-semver']), 'r+') as csv_stream:
+        operator_meta = release_config['operator-meta']
+        os.chdir('{base}/{dir}'.format(base = dist_git_dir, dir = operator_meta['dir']))
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = args.csv_version), 'r+') as csv_stream:
             try:
                 csv = yaml.safe_load(csv_stream)
                 deployment = csv['spec']['install']['spec']['deployments'][0]
@@ -164,11 +265,11 @@ if __name__ == "__main__":
                 for container in deployment['spec']['template']['spec']['containers']:
                     if container['name'] != operator['replace']:
                         continue
-                    
+
                     container['image'] = operator_image
                     image = {'name':container['name'].upper().replace('-', '_'), 'value':operator_image}
                     relatedImages.append(image.copy())
-                    
+
                     for name, components in release_config['components'].items():
                         if name == 'operator':
                             continue
@@ -178,19 +279,17 @@ if __name__ == "__main__":
                             env = env.upper().replace('-', '_')
                             value = release_config['registry'] + component['name'] + '@' + component['image_sha']
                             envVar = {'name':env, 'value':value}
-                            
+
                             index = exist(env, container['env'])
                             if index != -1:
                                 container['env'][index]['value'] = value
                             else:
                                 container['env'].append(envVar.copy())         
-                            
+
                             relatedImages.append(envVar.copy())
 
                 csv['metadata']['annotations']['containerImage'] = operator_image
                 csv['spec']['relatedImages'] = relatedImages
-                csv['spec']['version'] = release_config['version']
-                csv['metadata']['name'] = form_csv_name(csv['metadata']['name'], release_config['version'])
 
                 csv_stream.seek(0)
                 csv_stream.truncate()
@@ -213,11 +312,15 @@ if __name__ == "__main__":
             sys.exit(1)
         print(status.decode())
         print_line()
-    
+
     if args.enable_operator:
+        if not args.csv_version:
+            print('--new-csv-version not defined')
+            sys.exit(1)
+
         print('Mirroring images')
         print_line()
-        
+
         os.chdir(script_dir)
         command = './sync-source.sh metasync'
         proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)
@@ -231,14 +334,14 @@ if __name__ == "__main__":
 
         operator_meta = release_config['operator-meta']
         os.chdir('{root}/dist-git/{meta}'.format(root = workspace_dir, meta = operator_meta['dir']))
-        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = release_config['csv-semver']), 'r') as csv_stream:
+        with open('manifests/{ver}/openshift-pipelines-operator.v{ver}.clusterserviceversion.yaml'.format(ver = args.csv_version), 'r') as csv_stream:
             try:
                 csv = yaml.safe_load(csv_stream)
             except yaml.YAMLError as exc:
                 print(exc)
                 sys.exit(1)
         related_mages = csv['spec']['relatedImages']
-        
+
         mirror = release_config['mirror']
         mirror_threads = []
         failed_mirrors = 0
@@ -258,7 +361,7 @@ if __name__ == "__main__":
         if failed_mirrors > 0:
             print('{mirrors} mirrorings are failed '.format(mirrors=failed_mirrors))
             sys.exit(1)
-        
+
         os.chdir(script_dir)
         command = './enable-operator.sh'
         proc = Popen([command], stdout=PIPE, stderr=PIPE, shell=True)

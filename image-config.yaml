@@ -1,5 +1,4 @@
 version: 1.0.0
-csv-semver: 1.0.1
 
 components:
   pipelines:
