@@ -132,7 +132,7 @@ if __name__ == "__main__":
             print('Build tests are completed')
             sys.exit(0)
 
-    if args.build_release_images or args.update_csv:
+    if args.update_csv:
         #list images
         proc = Popen(['brew list-builds --quiet --prefix="openshift-pipelines" | sort -V'], stdout=PIPE, shell=True)
         (builds, err) = proc.communicate()
