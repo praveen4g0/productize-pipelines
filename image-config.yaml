@@ -1,4 +1,4 @@
-version: 1.0.0
+version: 1.1.0
 
 components:
   pipelines:
@@ -76,7 +76,6 @@ components:
     name: pipelines-rhel8-operator
     replace: openshift-pipelines-operator
     dir: openshift-pipelines-operator
-    pipeline_version: 0.11.3
 
 operator-meta:
   brew-package: openshift-pipelines-operator-1-tech-preview-pipelines-rhel8-operator-metadata-container

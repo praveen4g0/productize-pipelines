@@ -56,5 +56,5 @@ ifndef CSV_VERSION
 	@echo CSV_VERSION not defined
 	@exit 1
 endif
-	./release.py --enable-operator true
+	./release.py --enable-operator true \
 	--csv-version  ${CSV_VERSION}

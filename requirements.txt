@@ -1,11 +1,11 @@
 argcomplete==1.9.5
 certifi==2019.11.28
 cryptography==2.8
-dbus-python==1.2.8
+dbus-python==1.2.16
 decorator==4.3.0
 idna==2.8
 kerberos==1.3.0
-kobo==0.9.0
+kobo==0.14.0
 koji==1.20.0
 operator-courier==2.1.7
 pathspec==0.6.0
@@ -13,7 +13,7 @@ pid==2.2.3
 ply==3.11
 pycparser==2.19
 pycrypto==2.6.1
-pycurl==7.43.0.2
+pycurl==7.43.0.5
 pydbus==0.6.0
 pyenchant==2.0.0
 pylint==2.4.4
@@ -21,7 +21,7 @@ pyOpenSSL==19.1.0
 PySocks==1.6.8
 python-augeas==0.5.0
 python-dateutil==2.8.1
-PyYAML==5.1.2
+PyYAML==5.3.1
 requests==2.22.0
 requests-file==1.4.3
 requests-ftp==0.3.1
