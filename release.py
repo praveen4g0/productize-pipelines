@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     if args.new_csv:
         if not args.csv_version:
-            print('--new-csv-version not defined')
+            print('--csv-version not defined')
             sys.exit(1)
         if not args.from_csv_version:
             print('--from-csv-version not defined')
@@ -174,7 +174,7 @@ if __name__ == "__main__":
                     if container['name'] != operator['replace']:
                         continue
                     container['image'] = operator_image
-                    image = {'name':container['name'].upper().replace('-', '_'), 'value':operator_image}
+                    image = {'name':container['name'].upper().replace('-', '_'), 'image':operator_image}
                     relatedImages.append(image.copy())
 
                     for name, components in release_config['components'].items():
@@ -186,6 +186,7 @@ if __name__ == "__main__":
                             env = env.upper().replace('-', '_')
                             value = '<new image>'
                             envVar = {'name':env, 'value':value}
+                            relatedImage = {'name':env, 'image':value}
 
                             index = exist(env, container['env'])
                             if index != -1:
@@ -193,7 +194,7 @@ if __name__ == "__main__":
                             else:
                                 container['env'].append(envVar.copy())
 
-                            relatedImages.append(envVar.copy())
+                            relatedImages.append(relatedImage.copy())
 
                 csv['metadata']['annotations']['containerImage'] = operator_image
                 csv['spec']['relatedImages'] = relatedImages
@@ -231,7 +232,7 @@ if __name__ == "__main__":
 
     if args.update_csv:
         if not args.csv_version:
-            print('--new-csv-version not defined')
+            print('--csv-version not defined')
             sys.exit(1)
 
         #list images
@@ -267,7 +268,7 @@ if __name__ == "__main__":
                         continue
 
                     container['image'] = operator_image
-                    image = {'name':container['name'].upper().replace('-', '_'), 'value':operator_image}
+                    image = {'name':container['name'].upper().replace('-', '_'), 'image':operator_image}
                     relatedImages.append(image.copy())
 
                     for name, components in release_config['components'].items():
@@ -279,6 +280,7 @@ if __name__ == "__main__":
                             env = env.upper().replace('-', '_')
                             value = release_config['registry'] + component['name'] + '@' + component['image_sha']
                             envVar = {'name':env, 'value':value}
+                            relatedImage = {'name':env, 'image':value}
 
                             index = exist(env, container['env'])
                             if index != -1:
@@ -286,7 +288,7 @@ if __name__ == "__main__":
                             else:
                                 container['env'].append(envVar.copy())         
 
-                            relatedImages.append(envVar.copy())
+                            relatedImages.append(relatedImage.copy())
 
                 csv['metadata']['annotations']['containerImage'] = operator_image
                 csv['spec']['relatedImages'] = relatedImages
@@ -315,7 +317,7 @@ if __name__ == "__main__":
 
     if args.enable_operator:
         if not args.csv_version:
-            print('--new-csv-version not defined')
+            print('--csv-version not defined')
             sys.exit(1)
 
         print('Mirroring images')

@@ -106,7 +106,7 @@ the current release target version, then create on using the `make new-csv` targ
 
 eg:
 ```
-CSV_VERSION=1.2.0-rc1 FROM_CSV_VERSION=1.0.1 OPERATOR_CHANNEL_NAME=preview make new-csv
+CSV_VERSION=1.1.0-rc1 FROM_CSV_VERSION=1.0.1 OPERATOR_CHANNEL_NAME=preview make new-csv
 ```
 
 #### Refelct Images SHA in operator CSV
@@ -114,7 +114,7 @@ CSV_VERSION=1.2.0-rc1 FROM_CSV_VERSION=1.0.1 OPERATOR_CHANNEL_NAME=preview make 
 After Images are built, we need to update them in the CSV file.
 
 ```
-CSV_VERSION=1.2.0-rc1 make update-csv-image-ref
+CSV_VERSION=1.1.0-rc1 make update-csv-image-ref
 ```
 
 #### Publish Operator
@@ -122,7 +122,7 @@ It reflects latest container images URL into CSV file and publish the operator m
 (builds and pushes the operator metadata image)
 
 ```
-CSV_VERSION=1.2.0-rc1 make publish-operator
+CSV_VERSION=1.1.0-rc1 make publish-operator
 ```
 
 

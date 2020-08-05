@@ -105,7 +105,7 @@ if [ "$1" == "metasync" ]; then
 fi
 
 # sync pipelines repo
-PIPELINE_COMPONENTS=("controller webhook bash creds-init entrypoint gcs-fetcher git-init gsutil imagedigestexporter kubeconfigwriter nop pullrequest-init")
+PIPELINE_COMPONENTS=("controller webhook creds-init entrypoint gcs-fetcher git-init imagedigestexporter kubeconfigwriter nop pullrequest-init")
 IGNORE_IMAGE_SYNC=("nop gsutil")
 sync_components_source "${OP_UPSTREAM_URL}" "${OP_UPSTREAM_BRANCH}" "pipelines" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${PIPELINE_COMPONENTS}" "${IGNORE_IMAGE_SYNC}"
 
@@ -116,12 +116,6 @@ sync_components_source "${OPT_UPSTREAM_URL}" "${OPT_UPSTREAM_BRANCH}" "triggers"
 # sync operator repo
 OPERATOR_COMPONENTS=("operator")
 sync_components_source "${OPO_UPSTREAM_URL}" "${OPO_UPSTREAM_BRANCH}" "operator" "${OP_DIST_GIT_URL}" "${OP_DIST_GIT_BRANCH}" "openshift-pipelines-" "${OPERATOR_COMPONENTS}"
-
-print_line
-echo "Cloning buildah image"
-print_line
-BUILDAH_WORKSPACE="${DIST_GIT_DIR}/openshift-pipelines-catalog-buildah"
-clone_repo "${BUILDAH_WORKSPACE}" "${OP_DIST_GIT_URL}/openshift-pipelines-catalog-buildah" "${OP_DIST_GIT_BRANCH}"
 
 print_line
 echo "Cloning operator metdata"
