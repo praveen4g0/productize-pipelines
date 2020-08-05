@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+echo CSV_VERSION: $CSV_VERSION
+
 TOKEN=${TOKEN:-}
 test -z "${TOKEN}" && {
     echo "TOKEN env variable is required"
@@ -18,7 +20,7 @@ function reset_manifests() {
   echo "Restore image-config.yaml"
   cp image-config.yaml.bk image-config.yaml || true
   echo "Restore operator-source.yaml"
-  cp operator-source.yaml.bk operator-soruce.yaml || true
+  cp operator-source.yaml.bk operator-source.yaml || true
 }
 
 ENVSTAGE="stage"

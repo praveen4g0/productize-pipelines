@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=mirror['parallel']) as executor:
             for image_url in related_mages:
-                image = image_url['value'].split('/')[2]
+                image = image_url['image'].split('/')[2]
                 from_img = mirror['from-registry'] + '/' + mirror['from-org'] + '/' + mirror['from-image-prefix'] + image
                 to_img = mirror['to-registry'] + '/' + mirror['to-org'] + '/' + image.split('@')[0] + ':latest'
                 future = executor.submit(mirror_image, from_img, to_img, 1, mirror['retry'])
