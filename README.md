@@ -137,7 +137,7 @@ CSV_VERSION=1.1.0-rc1 make publish-operator
 6) Log into `OpenShift registry` using `oc registry login --insecure=true`
 7) while working witn stagging, make sure you have access to registry.stage.redhat.io by registering at https://access.stage.redhat.com
 8) set following environment variables
-   - ENVSTAGE : `pre-stage` for pre-stagging, `stage` for stagging
+   - ENVIRONMENT : `pre-stage` for pre-stagging, `stage` for stagging
    - STAGE_USER : (while working with stagging only) username for https://access.stage.redhat.com
    - STAGE_PASS : (while working with stagging only) password for https://access.stage.redhat.com
 
