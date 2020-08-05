@@ -183,6 +183,13 @@ variable prior to execute the script:
 - `QUAY_USERNAME`
 - `QUAY_TOKEN`
 - `TOKEN`
+- `ENVIRONMENT` (`pre-stage` or `stage`)
+
+then;
+
+```shell script
+CSV_VERSION=1.1.0-rc1 ./install-productized-operator.sh
+```
 
 You also need to ensure you did log in to your cluster before running
 the script (`oc login …`).
