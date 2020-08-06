@@ -167,7 +167,7 @@ shortcut: perform step 2 below (create token), then set relevant enviroment vari
     Create a secret using Quay token
 
     ```
-    oc create secret generic pre-stage-operators-secret --from-literal token="${TOKEN}" -n openshift-marketplace
+    oc create secret generic operators-source-pull-secret --from-literal token="${TOKEN}" -n openshift-marketplace
     ```
 3) All the images built while publishing an operator are in brew's registry which could be accessed over Red Hat VPN connection only. However, it's not possible/feasible to configure the OpenShift cluster to access the registry over the VPN connection. Hence we need to mirror those images from brew image registry(registry-proxy.engineering.redhat.com/rh-osbs) to OpenShift internal registry into `openshift-pipelines-tech-preview` namespace. Then create an `OperatorSource` resource in OpenShift cluster which points to the quay application registry and load the operator bundle.
 `OperatorHub` of OpenShift cluster refers to these bundles and enables the operator. Follow [Enable Operator](#enable-operator) section for all this. (point 3 and 4)
