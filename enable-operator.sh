@@ -12,4 +12,5 @@ oc adm policy add-cluster-role-to-user system:image-puller -z openshift-pipeline
 
 oc create ns openshift-pipelines
 oc adm policy add-cluster-role-to-user system:image-puller -z tekton-pipelines-controller -n openshift-pipelines
+oc adm policy add-cluster-role-to-user system:image-puller -z tekton-pipelines-webhook -n openshift-pipelines
 oc adm policy add-cluster-role-to-user system:image-puller -z tekton-triggers-controller -n openshift-pipelines
