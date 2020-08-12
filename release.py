@@ -17,7 +17,7 @@ def print_line():
 
 def build_image(config, test):
     print('Building an image for : {nvr}\n'.format(nvr = config['brew-package']))
-    command = 'rhpkg --release pipelines-1.0-rhel-8 container-build'
+    command = 'rhpkg --release pipelines-1.1-rhel-8 container-build'
     if 'repo-url' in config:
         flag = ' --repo-url="{url}"'.format(url = config['repo-url'])
         command = command + flag
@@ -171,7 +171,7 @@ if __name__ == "__main__":
                 deployment = csv['spec']['install']['spec']['deployments'][0]
                 relatedImages = []
                 for container in deployment['spec']['template']['spec']['containers']:
-                    if container['name'] != operator['replace']:
+                    if container['name'] != operator['replaces'][0]:
                         continue
                     container['image'] = operator_image
                     image = {'name':container['name'].upper().replace('-', '_'), 'image':operator_image}
@@ -182,19 +182,20 @@ if __name__ == "__main__":
                             continue
 
                         for component in components:
-                            env = 'IMAGE_' + name + '_' + component['replace']
-                            env = env.upper().replace('-', '_')
-                            value = '<new image>'
-                            envVar = {'name':env, 'value':value}
-                            relatedImage = {'name':env, 'image':value}
+                            for replace in component['replaces']:
+                                env = 'IMAGE_' + replace
+                                env = env.upper().replace('-', '_')
+                                value = '<new image>'
+                                envVar = {'name':env, 'value':value}
+                                relatedImage = {'name':env, 'image':value}
 
-                            index = exist(env, container['env'])
-                            if index != -1:
-                                container['env'][index]['value'] = value
-                            else:
-                                container['env'].append(envVar.copy())
+                                index = exist(env, container['env'])
+                                if index != -1:
+                                    container['env'][index]['value'] = value
+                                else:
+                                    container['env'].append(envVar.copy())
 
-                            relatedImages.append(relatedImage.copy())
+                                relatedImages.append(relatedImage.copy())
 
                 csv['metadata']['annotations']['containerImage'] = operator_image
                 csv['spec']['relatedImages'] = relatedImages
@@ -264,7 +265,7 @@ if __name__ == "__main__":
                 operator_image = release_config['registry'] + operator['name'] + '@' + operator['image_sha']
                 relatedImages = []
                 for container in deployment['spec']['template']['spec']['containers']:
-                    if container['name'] != operator['replace']:
+                    if container['name'] != operator['replaces'][0]:
                         continue
 
                     container['image'] = operator_image
@@ -276,19 +277,20 @@ if __name__ == "__main__":
                             continue
 
                         for component in components:
-                            env = 'IMAGE_' + name + '_' + component['replace']
-                            env = env.upper().replace('-', '_')
-                            value = release_config['registry'] + component['name'] + '@' + component['image_sha']
-                            envVar = {'name':env, 'value':value}
-                            relatedImage = {'name':env, 'image':value}
+                            for replace in component['replaces']:
+                                env = 'IMAGE_' + replace
+                                env = env.upper().replace('-', '_')
+                                value = release_config['registry'] + component['name'] + '@' + component['image_sha']
+                                envVar = {'name':env, 'value':value}
+                                relatedImage = {'name':env, 'image':value}
 
-                            index = exist(env, container['env'])
-                            if index != -1:
-                                container['env'][index]['value'] = value
-                            else:
-                                container['env'].append(envVar.copy())         
+                                index = exist(env, container['env'])
+                                if index != -1:
+                                    container['env'][index]['value'] = value
+                                else:
+                                    container['env'].append(envVar.copy())
 
-                            relatedImages.append(relatedImage.copy())
+                                relatedImages.append(relatedImage.copy())
 
                 csv['metadata']['annotations']['containerImage'] = operator_image
                 csv['spec']['relatedImages'] = relatedImages

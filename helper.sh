@@ -77,6 +77,7 @@ function remove_repo_if_clean() {
 
 function build() {
   local directory=$1
+  local tag=$2
 
   echo "Attempting to build in ${directory}."
 
@@ -96,13 +97,13 @@ function build() {
 
     if ${build_enabled}; then
       echo "Building in ${directory}"
-      rhpkg container-build
+      rhpkg container-build --target ${tag}
     fi
   else
     if ${force_build_enabled}; then
       echo "No new commits. Forcing build!"
       echo "To disable forced builds, set force_build_enable=false in config.sh"
-      rhpkg container-build
+      rhpkg container-build --target ${tag}
     else
       echo "No new commits. Skipping build!"
       echo "To force build, set force_build_enable=true in config.sh"

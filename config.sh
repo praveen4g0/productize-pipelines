@@ -14,8 +14,9 @@ force_build_enabled=false
 # Specify partial dist-git URL
 OP_DIST_GIT_URL="ssh://${USER}@pkgs.devel.redhat.com/containers"
 # Specify dist-git branch
-OP_DIST_GIT_BRANCH="pipelines-1.0-rhel-8"
+OP_DIST_GIT_BRANCH="pipelines-1.1-rhel-8"
 OP_OPERATOR_METADATA_DIST_GIT_BRANCH="pipelines-1-rhel-8"
+OP_OPERATOR_METADATA_DIST_GIT_TAG="pipelines-1.1-rhel-8-containers-candidate"
 
 # Pipelines Repository URL's
 OP_UPSTREAM_URL="git@github.com:openshift/tektoncd-pipeline.git"
