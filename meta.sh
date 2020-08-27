@@ -18,4 +18,4 @@ else
   echo "No image reference changes to commit to the CSV"
 fi
 
-build ${OP_OPERATOR_META_WORKSPACE}
+build ${OP_OPERATOR_META_WORKSPACE} ${OP_OPERATOR_METADATA_DIST_GIT_TAG}
