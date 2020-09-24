@@ -53,7 +53,7 @@ sed  -i "s@\(to-registry:\ \).*@\1${ROUTE}@" image-config.yaml
 
 if [[ ${ENVIRONMENT} = ${ENVSTAGE} ]]; then
   echo "Login to on stagging registry"
-  oc registry login --registry registry.stage.redhat.io --auth-basic="${STAGE_USER}:${STAGE_PASS}"
+  oc registry login --registry registry.stage.redhat.io --auth-basic="${STAGE_USER}:${STAGE_PASS}" --insecure=true
   sed  -i -e "s@\(from-registry:\ \).*@\1${STAGGING_REGISTRY}@" \
           -e "s@\(from-org:\ \).*@\1openshift-pipelines-tech-preview@" \
           -e "s@\(from-image-prefix:\ \).*@\1''@" image-config.yaml

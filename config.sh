@@ -12,7 +12,7 @@ push_enabled=true          # Enable push to dist-git repos
 force_build_enabled=false
 
 # Specify partial dist-git URL
-OP_DIST_GIT_URL="ssh://${USER}@pkgs.devel.redhat.com/containers"
+OP_DIST_GIT_URL="git://pkgs.devel.redhat.com/containers"
 # Specify dist-git branch
 OP_DIST_GIT_BRANCH="pipelines-1.1-rhel-8"
 OP_OPERATOR_METADATA_DIST_GIT_BRANCH="pipelines-1-rhel-8"
